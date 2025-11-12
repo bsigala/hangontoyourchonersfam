@@ -1676,10 +1676,8 @@ body::before {
                     <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ Mobile Responsive</div>
                     <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ WCAG AA Compliant</div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="app.js" defer></script>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
