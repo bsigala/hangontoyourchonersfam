@@ -255,6 +255,23 @@ body::before {
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
+.terminal-block {
+  background: rgba(0,0,0,0.5);
+  padding: 24px;
+  border-radius: 12px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #00FF88;
+  line-height: 1.8;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.terminal-block .dollar { color: #FFD700; }
+.terminal-block .comment { color: #00D9FF; }
+.terminal-block .success { color: #FF00FF; 
+
+}
+
 /* HERO SECTION - CAPTIVATING ENTRANCE */
 .hero-section {
   min-height: 100vh;
@@ -1688,14 +1705,16 @@ body::before {
             <p style="color:var(--text-light);text-align:center;margin-bottom:24px;font-size:16px;line-height:1.8;">
                 This application is <strong>GitHub Pages ready</strong>, enterprise-grade, and fully functional. Deploy globally in minutes.
             </p>
-            <div style="background:rgba(0,0,0,0.5);padding:24px;border-radius:12px;font-family:monospace;font-size:13px;color:#00FF88;line-height:1.8;">
-                <div><span style="color:#FFD700;">$</span> git clone [repository]</div>
-                <div><span style="color:#FFD700;">$</span> cd ascension-architect-mastery</div>
-                <div><span style="color:#FFD700;">$</span> git push origin main</div>
-                <div style="margin-top:12px;color:#00D9FF;"># Enable GitHub Pages in Settings &gt; Pages</div>
-                <div style="color:#00D9FF;"># Source: main branch, root folder</div>
-                <div style="margin-top:12px;color:#FF00FF;">✓ Live at: https://bsigala.github.io/hangontoyourchonersfam/</div>
-            </div>
+          <pre class="terminal-block"><code>
+<span class="dollar">$</span> git clone [repository]
+<span class="dollar">$</span> cd ascension-architect-mastery
+<span class="dollar">$</span> git push origin main
+
+<span class="comment"># Enable GitHub Pages in Settings &gt; Pages</span>
+<span class="comment"># Source: main branch, root folder</span>
+
+<span class="success">✓ Live at: https://bsigala.github.io/hangontoyourchonersfam/</span>
+</code></pre>
             <div style="margin-top:24px;text-align:center;">
                 <div style="display:inline-flex;gap:16px;flex-wrap:wrap;justify-content:center;">
                     <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ 100% Static HTML/CSS/JS</div>
