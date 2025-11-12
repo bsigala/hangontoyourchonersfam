@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOLLYWOOD'S FINEST: God-Mode Gamified Discussion Platform</title>
+    <title>HOLLYWOOD'S FINEST: Discussion Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-/* DESIGN SYSTEM FOUNDATION */
 :root {
   --color-white: rgba(255, 255, 255, 1);
   --color-black: rgba(0, 0, 0, 1);
@@ -47,8 +46,6 @@
   --radius-lg: 12px;
   --duration-normal: 250ms;
   --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* GAMIFICATION PALETTE - TRANSCENDENT */
   --deep-space-blue: #0B1A2D;
   --electric-cyan: #00D9FF;
   --plasma-gold: #FFD700;
@@ -105,8 +102,6 @@ body::before {
   pointer-events: none;
   z-index: 0;
 }
-
-/* SCROLL PROGRESS INDICATOR */
 .scroll-progress {
   position: fixed;
   top: 0;
@@ -118,8 +113,6 @@ body::before {
   transition: width 0.1s ease-out;
   box-shadow: 0 0 20px rgba(0, 191, 255, 0.8);
 }
-
-/* STICKY NAVIGATION */
 .sticky-nav {
   position: fixed;
   top: -100px;
@@ -183,8 +176,6 @@ body::before {
 .nav-link:hover::after {
   width: 100%;
 }
-
-/* JOURNEY STATS HUD */
 .journey-hud {
   position: fixed;
   top: 20px;
@@ -254,8 +245,6 @@ body::before {
   transition: width 0.5s ease;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
-
-/* HERO SECTION - CAPTIVATING ENTRANCE */
 .hero-section {
   min-height: 100vh;
   display: flex;
@@ -376,8 +365,6 @@ body::before {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(15px); }
 }
-
-/* SECTION STYLING */
 .section {
   padding: 100px 32px;
   max-width: 1400px;
@@ -415,9 +402,7 @@ body::before {
   margin-right: auto;
   line-height: 1.8;
 }
-
-/* VIDEO EMBED */
-.video-container {
+.video-container {<iframe width="560" height="315" src="https://www.youtube.com/embed/If8WdRSq_78?si=-ogHjRq49pXZxpyQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   position: relative;
   width: 100%;
   max-width: 900px;
@@ -442,7 +427,6 @@ body::before {
   height: 100%;
 }
 
-/* STATISTICS GRID */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -481,7 +465,6 @@ body::before {
   letter-spacing: 0.05em;
 }
 
-/* CHARTS */
 .charts-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -510,7 +493,6 @@ body::before {
   height: 300px;
 }
 
-/* PILLARS GRID */
 .pillars-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -705,7 +687,6 @@ body::before {
   100% { transform: scale(1); }
 }
 
-/* FORENSIC COVENANT */
 .forensic-section {
   background: rgba(15, 23, 42, 0.5);
   padding: 80px 32px;
@@ -751,7 +732,6 @@ body::before {
   line-height: 1.6;
 }
 
-/* FOOTER */
 .footer-section {
   text-align: center;
   padding: 100px 32px;
@@ -824,7 +804,6 @@ body::before {
   50% { transform: scale(1.15); }
 }
 
-/* LOADING SPINNER */
 .spinner {
   display: inline-block;
   width: 20px;
@@ -881,7 +860,6 @@ body::before {
   }
 }
 
-/* UTILITY CLASSES */
 .text-gradient {
   background: linear-gradient(135deg, var(--cyan-clarity), var(--magenta-niche));
   -webkit-background-clip: text;
@@ -893,7 +871,6 @@ body::before {
   filter: drop-shadow(0 0 20px currentColor);
 }
 
-/* CTA BUTTON */
 .cta-button {
   margin-top: 32px;
   padding: 20px 48px;
@@ -919,7 +896,6 @@ body::before {
   transform: scale(1.05) translateY(-2px);
 }
 
-/* ROADMAP VISUAL */
 .roadmap-visual {
   padding: 40px;
   background: rgba(15, 10, 31, 0.6);
@@ -979,7 +955,6 @@ body::before {
   margin: 0 -5px;
 }
 
-/* MISSION LAYER (Full Screen Modal) */
 .mission-layer {
   position: relative;
 }
@@ -1183,7 +1158,6 @@ body::before {
   cursor: not-allowed;
 }
 
-/* BADGE SHOWCASE */
 .badge-showcase {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1325,7 +1299,6 @@ body::before {
   color: var(--mission-locked);
 }
 
-/* RESPONSIVE ADJUSTMENTS */
 @media (max-width: 768px) {
   .journey-hud {
     top: 10px;
