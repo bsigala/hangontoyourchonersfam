@@ -1,2044 +1,1712 @@
-// ========================================
-// PILLAR 1: EXPONENTIAL GAMIFICATION ROADMAP
-// ========================================
-
-// QUEST STRUCTURE: Hollywood's Finest Discussion Missions
-const discussionQuests = {
-  mainQuest: {
-    id: 'the-awakening',
-    title: 'THE AWAKENING - Deconstruct McKenzie\'s Ordeal',
-    description: 'Perform forensic analysis of the bureaucratic machinery that manufactured McKenzie Tran\'s suffering.',
-    icon: '🎬'
-  },
-  subQuests: [
-    {
-      id: 'sub-quest-1',
-      title: 'The Shield Protocol - Analyze Access Barriers',
-      description: 'McKenzie encountered a gauntlet of closed doors. What did you learn about the nature of accessing social services? Is the system designed to help or to exhaust?',
-      question: 'What did you learn about the nature of accessing and receiving social services for clients like McKenzie? Do you think it is designed in a way to help McKenzie? Why or why not?',
-      requirements: {
-        paragraphs: 3,
-        citations: 'documentary moments',
-        concepts: ['systemic analysis', 'bureaucratic fragmentation']
-      },
-      xpBase: 100,
-      xpBonus: 50,
-      unlocked: true
-    },
-    {
-      id: 'sub-quest-2',
-      title: 'The Architect\'s Vision - Strategic Intervention Design',
-      description: 'You are now McKenzie\'s advocate. Armed with systemic understanding, what strategies would you deploy to shatter bureaucratic entrenchment?',
-      question: 'If you were McKenzie\'s social worker, what are some strategies you would implement to help her?',
-      requirements: {
-        paragraphs: 3,
-        strategies: 'concrete interventions',
-        framework: '34 Vows integration'
-      },
-      xpBase: 150,
-      xpBonus: 75,
-      unlocked: false,
-      requires: ['sub-quest-1']
-    }
-  ],
-  sideQuests: [
-    {
-      id: 'compassionate-witness',
-      title: 'The Compassionate Witness',
-      description: 'Provide 2 thoughtful, substantive peer responses (1 paragraph minimum each)',
-      narrative: 'Your voice matters. Elevate your peers\' insights, challenge assumptions, forge intellectual alliances.',
-      xpReward: 50,
-      perResponse: 50,
-      requiredResponses: 2,
-      collectible: 'silver-key-discourse'
-    },
-    {
-      id: 'deep-dive-scholar',
-      title: 'The Deep Dive Scholar',
-      description: 'Integrate external research beyond documentary (academic articles, policy analysis)',
-      xpReward: 200,
-      collectible: 'gold-relic-scholarship'
-    },
-    {
-      id: 'first-responder',
-      title: 'The First Responder',
-      description: 'Be among first 5 students to post original response',
-      xpReward: 75,
-      timeLimit: 48,
-      collectible: 'bronze-token-initiative'
-    }
-  ]
-};
-
-// HIDDEN OBJECTIVES (Discovery-based bonus XP)
-const hiddenObjectives = [
-  {
-    id: 'economist-badge',
-    trigger: '$1 vs $100 Paradox',
-    description: 'Cite the "$1 vs $100 Paradox" in your analysis',
-    rewardXP: 25,
-    badge: 'Economist'
-  },
-  {
-    id: 'lexicon-master',
-    trigger: 'strategic attrition',
-    description: 'Use the phrase "strategic attrition" correctly in context',
-    rewardXP: 25,
-    badge: 'Lexicon Master'
-  },
-  {
-    id: 'policy-innovator',
-    trigger: 'Warm Handoff',
-    description: 'Propose a "Warm Handoff" intervention strategy',
-    rewardXP: 50,
-    badge: 'Policy Innovator'
-  },
-  {
-    id: 'forensic-investigator',
-    trigger: 'bureaucratic fragmentation',
-    description: 'Identify 3 specific examples of bureaucratic fragmentation',
-    rewardXP: 100,
-    badge: 'Forensic Investigator'
-  }
-];
-
-// DISCUSSION RESPONSE TRACKER
-const discussionData = {
-  responses: [],
-  peerEngagements: [],
-  hiddenObjectivesFound: []
-};
-
-// LEGACY MISSIONS (Kept for compatibility but hidden)
-const majorMissions = [
-  {id:1,title:"Shatter Structural Fragmentation",icon:"💎",sub_missions:[{title:"Map Existing Silos and Pain Points",steps:["List organizations/agencies that interact.","Describe each pain point/barrier.","Identify who does/doesn't cooperate."]},{title:"Document the $1 vs $100 Paradox in Real Life",steps:["Find a real-world resource paradox.","Write how $1 underinvestment creates $100 in cost.","Share on your journey log."]},{title:"Draft Your Vow: Restore Relational Perspective",steps:["Write a commitment statement.","Share with a peer or supporter."]}],badge:"fragmentation-buster"},
-  {id:2,title:"Deconstruct Bureaucratic Entrenchment",icon:"🛠️",sub_missions:[{title:"Identify Administrative Barriers in Your Region",steps:["Choose a system (housing, benefits, legal).","Write down barriers you faced.","Find official policies that create these blocks."]},{title:"Write a Policy Challenge Letter",steps:["Draft a letter challenging one barrier.","Send it to an authority or ally.","Log the response/outcome."]},{title:"Secure a Peer Testimony",steps:["Ask another person for a story about this barrier.","Obtain their consent for advocacy use.","Submit as part of your mission evidence."]}],badge:"bureaucracy-breaker"},
-  {id:3,title:"24-Month Stability Alchemy",icon:"🧪",sub_missions:[{title:"List All Resources Collected in Past 3 Months",steps:["Review your support history.","Write out all resources received.","Evaluate which helped most."]},{title:"Plan Resource Chain for Continuous Support",steps:["Identify gaps in your support systems.","Create a plan to fill/replace resources before loss.","Share this plan."]},{title:"Share Milestone with Community",steps:["Describe a recent success.","Share in peer/support group or with advocate."]}],badge:"stability-alchemist"},
-  {id:4,title:"Trauma Defense & Reframing",icon:"🛡️",sub_missions:[{title:"Identify Punitive Labels in Your Records",steps:["Review case documents.","Highlight non-compliance or deficit language.","Note when trauma symptoms were punished."]},{title:"Obtain Clinical Documentation",steps:["Work with therapist to document PTSD/trauma.","Request letter explaining symptom-behavior connection.","Submit as reframe evidence."]},{title:"Submit Corrective Statement",steps:["Draft statement with clinical context.","Request formal case record amendment.","Track response and outcome."]}],badge:"trauma-defender"},
-  {id:5,title:"Peer Relatability & Success Amplification",icon:"✨",sub_missions:[{title:"Document a Recent Win",steps:["Describe an achievement, no matter how small.","Note resources used or people who helped.","Write impact on your well-being."]},{title:"Request Success Note in File",steps:["Ask case manager to add formal success note.","Provide written summary of achievement.","Follow-up to ensure it's documented."]},{title:"Share Story Anonymously or Publicly",steps:["Decide on anonymity vs. public credit.","Submit story as program success case.","Celebrate publicly or internally."]}],badge:"peer-champion"},
-  {id:6,title:"Crisis De-Escalation & Trust Building",icon:"🕊️",sub_missions:[{title:"Identify Your Trust Barriers",steps:["Reflect on past institutional betrayals.","Write down specific fears/concerns.","Note which agencies/people triggered distrust."]},{title:"Practice De-Escalation Scripts",steps:["Memorize 2-3 bridge-building phrases.","Role-play with supporter or therapist.","Use in next high-stress interaction."]},{title:"Establish Mutual Accountability Agreement",steps:["Propose written agreement with caseworker.","Include clear expectations and follow-through.","Review and adjust as needed."]}],badge:"trust-builder"},
-  {id:7,title:"Hyper-Niche Resource Discovery",icon:"🗺️",sub_missions:[{title:"Map Your Unique Needs",steps:["List all needs (housing, medical, legal, etc).","Identify which are rare/hard-to-find.","Prioritize top 3 urgent needs."]},{title:"Research Invisible Networks",steps:["Search local faith/community groups.","Contact advocacy orgs with niche focus.","Ask peers for hidden resource tips."]},{title:"Secure At Least One Hyper-Niche Resource",steps:["Apply or reach out to discovered resource.","Document contact/process.","Share discovery with peers."]}],badge:"resource-hunter"},
-  {id:8,title:"Ascendant Persona Encoding",icon:"👑",sub_missions:[{title:"Reframe a Deficit Narrative",steps:["Choose a 'failure' or gap in your history.","Write how it demonstrates resilience/adaptability.","Practice telling this reframed story."]},{title:"Create Your Asset Portfolio",steps:["List all skills, strengths, experiences.","Highlight unique perspectives from adversity.","Compile into 1-page asset summary."]},{title:"Deploy Asset Story in Advocacy",steps:["Use asset narrative in next interview/meeting.","Request it be added to case file.","Reflect on response/impact."]}],badge:"ascendant-persona"},
-  {id:9,title:"Executive Self-Advocacy Mastery",icon:"📢",sub_missions:[{title:"Identify Key Message to Communicate",steps:["What do you need authorities to understand?","Write core message in 1-2 sentences.","Prepare supporting evidence."]},{title:"Craft Formal Communication",steps:["Write letter, email, or statement.","Use asset-based, solution-focused language.","Proofread and refine tone."]},{title:"Deliver and Follow-Up",steps:["Send communication through appropriate channel.","Request confirmation of receipt.","Track response and next steps."]}],badge:"advocacy-master"},
-  {id:10,title:"Grand Unification of Services",icon:"🔗",sub_missions:[{title:"List All Active Service Providers",steps:["Write name, role, contact for each agency.","Note conflicting requirements across providers.","Identify overlaps or gaps."]},{title:"Request Coordination Meeting",steps:["Propose joint meeting with all providers.","Send meeting request with agenda.","Document who accepts vs. declines."]},{title:"Create Unified Service Plan",steps:["Synthesize all requirements into one plan.","Share with all providers for alignment.","Update plan as changes occur."]}],badge:"unification-champion"},
-  {id:11,title:"Longitudinal Risk Analysis",icon:"📊",sub_missions:[{title:"Map Your Trajectory",steps:["Draw timeline of past 6-12 months.","Mark highs, lows, crisis points.","Identify patterns or triggers."]},{title:"Predict Failure Points",steps:["Based on patterns, forecast next crisis risk.","Write what could prevent it.","Share prediction with supporter."]},{title:"Implement Preventative Action",steps:["Take one action to mitigate predicted risk.","Document action and rationale.","Monitor outcome over time."]}],badge:"risk-analyst"},
-  {id:12,title:"Milestone Prophet: 24-Month Roadmap",icon:"🎯",sub_missions:[{title:"Define Your Ultimate Stability Goal",steps:["Describe where you want to be in 24 months.","Be specific: housing, job, health, family.","Write why this goal matters to you."]},{title:"Break Into 6-Month Milestones",steps:["Divide 24-month goal into 4 phases.","Assign concrete milestones to each phase.","Identify resources needed per phase."]},{title:"Share Roadmap & Celebrate First Milestone",steps:["Present roadmap to caseworker or support group.","Commit to tracking progress monthly.","Celebrate when you hit first milestone."]}],badge:"milestone-prophet"},
-  {id:13,title:"Quantum Accountability Scoring",icon:"⚡",sub_missions:[{title:"Document Efforts vs. Outcomes",steps:["List all actions you've taken (appointments, applications, etc).","Note which led to positive outcomes.","Identify which were ignored or unacknowledged."]},{title:"Quantify Disparity",steps:["Calculate: % of efforts that received fair response.","Write narrative explaining disparity.","Prepare evidence for advocacy."]},{title:"Present Accountability Report",steps:["Share report with supervisor or ombudsman.","Request formal review of unacknowledged efforts.","Document response."]}],badge:"accountability-scorer"},
-  {id:14,title:"Digital Dossier Integrity Check",icon:"🔍",sub_missions:[{title:"Request Full Case File",steps:["Submit formal request for all records.","Review documents for accuracy.","Note discrepancies, errors, or bias."]},{title:"Compile List of Errors",steps:["Itemize each inaccuracy with evidence.","Write corrected version for each.","Prepare formal amendment request."]},{title:"Submit Amendments & Track",steps:["File corrections with appropriate authority.","Request written confirmation of updates.","Follow-up until resolved."]}],badge:"dossier-guardian"},
-  {id:15,title:"Vocational Narrative Transformation",icon:"💼",sub_missions:[{title:"Audit Your Work History",steps:["List all jobs, gigs, volunteer work.","Note gaps and reasons.","Identify transferable skills from each."]},{title:"Reframe Gaps as Growth",steps:["For each gap, write strategic growth narrative.","Highlight skills developed during gap (caregiving, recovery, education).","Practice telling story confidently."]},{title:"Deploy in Job Application",steps:["Use reframed narrative in resume or interview.","Request feedback from employment counselor.","Reflect on employer response."]}],badge:"vocational-transformer"},
-  {id:16,title:"Warm Handoff Cohesion Enforcement",icon:"🤝",sub_missions:[{title:"Identify Transition Points",steps:["List all service transitions (e.g., shelter to housing, hospital to outpatient).","Note where handoffs failed or succeeded.","Prioritize most critical upcoming transition."]},{title:"Request Warm Handoff Protocol",steps:["Ask current provider for warm handoff to next.","Ensure both parties communicate directly.","Document handoff plan."]},{title:"Verify Handoff Completion",steps:["Confirm new provider received all info.","Follow-up if gaps exist.","Report success/failure to supervisor."]}],badge:"handoff-enforcer"},
-  {id:17,title:"Empathy Burnout Shield",icon:"💚",sub_missions:[{title:"Acknowledge Your Emotional Load",steps:["Journal about stressors and trauma exposure.","Rate your burnout level (1-10).","Identify triggers."]},{title:"Implement Self-Care Routine",steps:["Choose 2-3 self-care practices.","Schedule them weekly.","Track adherence and mood."]},{title:"Seek Peer or Professional Support",steps:["Join peer support group or schedule therapy.","Share burden with trusted person.","Celebrate act of seeking help."]}],badge:"burnout-shield"},
-  {id:18,title:"Preventative Cost-Benefit Modeling",icon:"💰",sub_missions:[{title:"Identify a Preventable Crisis",steps:["Reflect on a past crisis.","Estimate what simple intervention could have prevented it.","Calculate cost of crisis vs. cost of prevention."]},{title:"Build Cost-Benefit Case",steps:["Write 1-page case study with numbers.","Use for policy advocacy or funding request.","Share with decision-maker."]},{title:"Advocate for Preventative Investment",steps:["Present case to agency or funder.","Request pilot program or policy change.","Track outcome."]}],badge:"cost-benefit-modeler"},
-  {id:19,title:"Institutional Rapport Building",icon:"🏛️",sub_missions:[{title:"Choose Institution to Rebuild Trust With",steps:["Identify agency where relationship is strained.","Reflect on what rebuild would look like.","Commit to trust-building effort."]},{title:"Initiate Positive Interaction",steps:["Send thank-you note or positive feedback.","Request informal check-in meeting.","Approach with openness and curiosity."]},{title:"Sustain Rapport Over Time",steps:["Follow-up regularly.","Communicate proactively about needs.","Celebrate small wins together."]}],badge:"rapport-builder"},
-  {id:20,title:"Narrative Integrity Auditor",icon:"📋",sub_missions:[{title:"Compare Multiple Records",steps:["Gather records from different agencies.","Compare narratives for contradictions.","Note where facts differ."]},{title:"Investigate Contradictions",steps:["Ask each agency for source of their info.","Identify where miscommunication occurred.","Determine accurate version."]},{title:"Unify Narrative Across Systems",steps:["Submit corrected narrative to all agencies.","Request alignment and acknowledgment.","Monitor for future consistency."]}],badge:"narrative-auditor"},
-  {id:21,title:"Public Policy Narrative Synthesis",icon:"📜",sub_missions:[{title:"Write Your Policy Story",steps:["Describe how policy failure impacted you.","Connect personal story to broader systemic issue.","Draft 1-2 page policy brief."]},{title:"Share with Legislator or Advocate",steps:["Identify appropriate policymaker or org.","Send story with call to action.","Request meeting or testimony opportunity."]},{title:"Track Policy Impact",steps:["Follow-up on whether story influenced change.","Document any resulting action.","Share outcome with peers."]}],badge:"policy-synthesizer"},
-  {id:22,title:"Legal Precedent Nexus Finder",icon:"⚖️",sub_missions:[{title:"Define Your Legal Challenge",steps:["Describe the legal issue you face.","Identify relevant laws or rights.","Summarize desired outcome."]},{title:"Research Favorable Precedents",steps:["Search case law databases or ask legal aid.","Find 2-3 cases similar to yours.","Note how they were decided."]},{title:"Apply Precedent to Your Case",steps:["Work with attorney to cite precedents.","Include in legal filings or advocacy.","Monitor how it strengthens your case."]}],badge:"precedent-finder"},
-  {id:23,title:"Micro-Resource Mobilizer",icon:"🚀",sub_missions:[{title:"Identify Immediate Need",steps:["What do you need in next 48 hours?","Be specific: food, transport, childcare, etc.","Prioritize urgency."]},{title:"Activate Network for Quick Support",steps:["Call/text 3-5 contacts.","Post in mutual aid group or app.","Visit community resource center."]},{title:"Secure and Document Resource",steps:["Obtain needed support.","Thank provider and document source.","Add to resource map for future."]}],badge:"micro-mobilizer"},
-  {id:24,title:"Policy Conflict Identifier",icon:"⚔️",sub_missions:[{title:"List Conflicting Demands",steps:["Identify 2+ agencies with contradictory requirements.","Describe the conflict clearly.","Note impact on your ability to comply."]},{title:"Document Catch-22 Scenario",steps:["Write how meeting one requirement prevents meeting another.","Gather evidence (emails, letters, etc).","Prepare case study."]},{title:"Advocate for Policy Alignment",steps:["Present conflict to ombudsman or supervisor.","Request policy exception or reform.","Track resolution."]}],badge:"conflict-identifier"}
-];
-
-// AI RESPONSE TEMPLATES (kept for future expansion)
-const responseTemplates = [
-  {prefix:"✨ SYSTEMIC ANALYSIS:",templates:["The structural barrier you've identified reveals critical failure in coordination. Document with timestamps."]},
-  {prefix:"🔥 SILO DEMOLITION:",templates:["The documentation barrier is solvable. Submit through ALL channels simultaneously."]}
-];
-
-// Writer helper for discussion posts
-const writingHelper = {
-  paragraphCount: 0,
-  wordCount: 0,
-  citationsFound: [],
-  hiddenTriggersDetected: []
-};
-
-// ========================================
-// PILLAR 2: UNLEASHED MASTERY MISSION & REWARD SYSTEM
-// ========================================
-
-// COLLECTIBLE ARTIFACTS (Functional Catalysts)
-const collectibleArtifacts = [
-  {id:'insight-1', name:'Artifact of Insight: Fragmentation Lens', icon:'🔍', rarity:'rare', effect:'Advanced visualization unlocked', missions:[1]},
-  {id:'insight-2', name:'Artifact of Insight: Trauma Decoder', icon:'🧠', rarity:'rare', effect:'Trauma pattern recognition', missions:[4]},
-  {id:'shard-1', name:'Volatile Data Shard: Housing Crisis', icon:'💎', rarity:'uncommon', missions:[3], fragment:1},
-  {id:'shard-2', name:'Volatile Data Shard: Legal Paradox', icon:'💎', rarity:'uncommon', missions:[22], fragment:2},
-  {id:'shard-3', name:'Volatile Data Shard: Policy Failure', icon:'💎', rarity:'uncommon', missions:[24], fragment:3},
-  {id:'shard-4', name:'Volatile Data Shard: Systemic Cost', icon:'💎', rarity:'uncommon', missions:[18], fragment:4},
-  {id:'shard-5', name:'Volatile Data Shard: Integration Blueprint', icon:'💎', rarity:'uncommon', missions:[10], fragment:5, completesSet:'Grand Policy Brief'},
-  {id:'blueprint-1', name:'Blueprint Fragment: Unification Core', icon:'📐', rarity:'epic', missions:[10]},
-  {id:'blueprint-2', name:'Blueprint Fragment: Accountability Engine', icon:'📐', rarity:'epic', missions:[13]},
-  {id:'blueprint-3', name:'Blueprint Fragment: Integration Matrix', icon:'📐', rarity:'epic', missions:[16]},
-  {id:'key-alpha', name:'Encrypted Strategic Key: Alpha', icon:'🔑', rarity:'legendary', unlocks:'impossible-1'},
-  {id:'key-beta', name:'Encrypted Strategic Key: Beta', icon:'🔑', rarity:'legendary', unlocks:'impossible-2'},
-  {id:'phoenix-feather', name:'Phoenix Feather of Rebirth', icon:'🦩', rarity:'mythic', effect:'Mastery Multiplier +0.5x'}
-];
-
-// Variable reward system
-function generateMissionReward(missionId, isCritical = false) {
-  const baseXP = 100;
-  const rewards = {xp: baseXP, collectibles: [], criticalSuccess: isCritical};
-  
-  if (isCritical) {
-    rewards.xp *= 2;
-    rewards.collectibles.push(getRandomRareCollectible());
-  }
-  
-  // Mission-specific collectibles
-  const missionCollectibles = collectibleArtifacts.filter(c => c.missions && c.missions.includes(missionId));
-  if (missionCollectibles.length > 0) {
-    rewards.collectibles.push(...missionCollectibles.slice(0, Math.random() > 0.5 ? 2 : 1));
-  }
-  
-  return rewards;
-}
-
-function getRandomRareCollectible() {
-  const rares = collectibleArtifacts.filter(c => c.rarity === 'rare' || c.rarity === 'epic');
-  return rares[Math.floor(Math.random() * rares.length)];
-}
-
-const achievementBadges = [
-  {name:"The Witness",icon:"🎬",tier:"Common",desc:"Watched Hollywood's Finest documentary"},
-  {name:"The Scholar",icon:"📖",tier:"Common",desc:"Read Stratospheric Deconstruction analysis"},
-  {name:"The Voice",icon:"📢",tier:"Rare",desc:"Posted first original discussion response"},
-  {name:"The Ally",icon:"🤝",tier:"Rare",desc:"Posted first peer response"},
-  {name:"Shield Protocol Master",icon:"🛡️",tier:"Epic",desc:"Completed Sub-Quest 1: Analyze Access Barriers"},
-  {name:"The Architect",icon:"🏛️",tier:"Epic",desc:"Completed Sub-Quest 2: Strategic Intervention Design"},
-  {name:"Compassionate Witness",icon:"✨",tier:"Epic",desc:"Provided 2+ thoughtful peer responses"},
-  {name:"Deep Dive Scholar",icon:"🔬",tier:"Legendary",desc:"Integrated external research beyond documentary"},
-  {name:"First Responder",icon:"🏆",tier:"Rare",desc:"Among first 5 to post original response"},
-  {name:"Economist",icon:"💰",tier:"Secret",desc:"Cited the $1 vs $100 Paradox"},
-  {name:"Lexicon Master",icon:"📚",tier:"Secret",desc:"Used 'strategic attrition' correctly"},
-  {name:"Policy Innovator",icon:"💡",tier:"Secret",desc:"Proposed Warm Handoff intervention"},
-  {name:"Forensic Investigator",icon:"🔍",tier:"Epic",desc:"Identified 3+ examples of bureaucratic fragmentation"},
-  {name:"Marathon Runner",icon:"🏃",tier:"Legendary",desc:"Maintained engagement throughout semester"},
-  {name:"The Leader",icon:"👑",tier:"Legendary",desc:"Received 5+ peer endorsements"},
-  {name:"The Pioneer",icon:"🌟",tier:"Epic",desc:"Proposed strategy adopted by classmates"},
-  {name:"Social Justice Warrior",icon:"⚔️",tier:"Mythic",desc:"Achieved MASTER tier status"},
-  {name:"Transcendent Advocate",icon:"🌠",tier:"Mythic",desc:"Achieved GOD-MODE tier status"}
-];
-
-const collectiblesList = [
-  {name:"Bronze Token of Initiative",icon:"🪙",tier:"Bronze",desc:"Earned by first 5 students to post."},
-  {name:"Bronze Token of Punctuality",icon:"⏰",tier:"Bronze",desc:"Submitted before deadline."},
-  {name:"Silver Key of Discourse",icon:"🔑",tier:"Silver",desc:"Completed peer response requirements."},
-  {name:"Silver Key of Integration",icon:"🔗",tier:"Silver",desc:"Cited documentary + readings."},
-  {name:"Gold Relic of Scholarship",icon:"🏆",tier:"Gold",desc:"Integrated external research."},
-  {name:"Gold Relic of Innovation",icon:"💡",tier:"Gold",desc:"Proposed novel intervention strategy."},
-  {name:"Mythic Shard of Transcendence",icon:"💎",tier:"Mythic",desc:"All quests completed at mastery level."},
-  {name:"Mythic Shard of Leadership",icon:"👑",tier:"Mythic",desc:"Most helpful peer contributions (voted)."}
-];
-
-// ========================================
-// PILLAR 3: ELITE BENCHMARK & ACHIEVEMENT MARKERS
-// ========================================
-
-// HIERARCHY OF ASCENDANCE (5 Rigorous Tiers)
-const tierStructure = [
-  {
-    name: 'APPRENTICE',
-    xpMin: 0, xpMax: 150,
-    badge: '🛡️', color: '#CD7F32',
-    requirements: {
-      missionsCompleted: 1,
-      description: 'Complete Sub-Quest 1 (Shield Protocol)'
-    },
-    abilities: ['Basic quest access', 'Discussion interface'],
-    validation: 'auto',
-    status: 'Awakening Scholar'
-  },
-  {
-    name: 'JOURNEYMAN',
-    xpMin: 151, xpMax: 400,
-    badge: '⭐', color: '#C0C0C0',
-    requirements: {
-      missionsCompleted: 2,
-      peerResponses: 1,
-      description: 'Complete both sub-quests + 1 peer response'
-    },
-    abilities: ['Side quest access', 'Peer endorsement system'],
-    validation: 'auto',
-    status: 'Critical Analyst'
-  },
-  {
-    name: 'EXPERT',
-    xpMin: 401, xpMax: 700,
-    badge: '👑', color: '#FFD700',
-    requirements: {
-      missionsCompleted: 2,
-      peerResponses: 2,
-      externalResearch: true,
-      description: 'All quests + 2 peer responses + external research'
-    },
-    abilities: ['Hidden objectives visible', 'Hall of Fame access'],
-    validation: 'auto',
-    status: 'Systemic Architect'
-  },
-  {
-    name: 'MASTER',
-    xpMin: 701, xpMax: 1000,
-    badge: '💎', color: '#E5E4E2',
-    requirements: {
-      allQuestsComplete: true,
-      innovativeSolutions: true,
-      peerLeadership: true,
-      description: 'Expert + innovative solutions + peer leadership'
-    },
-    abilities: ['Mentor status', 'Certificate eligibility', 'Featured responses'],
-    validation: 'auto',
-    status: 'Social Justice Warrior'
-  },
-  {
-    name: 'GOD_MODE',
-    xpMin: 1001, xpMax: 999999,
-    badge: '🌠', color: '#FF69B4',
-    requirements: {
-      allAchievements: true,
-      communityImpact: true,
-      earlySubmission: true,
-      description: 'All achievements + community impact + early submission'
-    },
-    abilities: ['Hall of Fame featured', 'Certificate of Mastery', 'Elite Scholars Network'],
-    validation: 'transcendent',
-    status: 'Transcendent Advocate'
-  }
-];
-
-function getCurrentTier() {
-  const xp = userProgress.xp;
-  for (let tier of tierStructure) {
-    if (xp >= tier.xpMin && xp <= tier.xpMax) {
-      return tier;
-    }
-  }
-  return tierStructure[0];
-}
-
-function getNextTier() {
-  const current = getCurrentTier();
-  const currentIndex = tierStructure.indexOf(current);
-  return tierStructure[currentIndex + 1] || null;
-}
-
-function checkTierRequirements(tier) {
-  const reqs = tier.requirements;
-  const progress = {
-    missionsCompleted: userProgress.badges.length >= (reqs.missionsCompleted || 0),
-    synthesisMissions: (userProgress.synthesisMissions || 0) >= (reqs.synthesisMissions || 0),
-    nexusChallenges: (userProgress.nexusChallenges || 0) >= (reqs.nexusChallenges || 0),
-    streakDays: userProgress.streak >= (reqs.streakDays || 0),
-    grandChallenge: reqs.grandChallenge ? userProgress.grandChallengeComplete : true,
-    uniqueCollectibles: userProgress.collectibles.length >= (reqs.uniqueCollectibles || 0),
-    allPillarsMastery: reqs.allPillarsMastery ? userProgress.badges.length >= 24 : true
-  };
-  
-  return Object.values(progress).every(v => v);
-}
-
-const benchmarks = [
-  {title:"The First Step",icon:"👣",desc:"Submitted first discussion response"},
-  {title:"Peer Connector",icon:"🤝",desc:"Engaged with 2+ classmates"},
-  {title:"Hidden Seeker",icon:"🔍",desc:"Found 3+ hidden objectives"},
-  {title:"Early Adopter",icon:"🌟",desc:"Posted within first 48 hours"},
-  {title:"Deep Thinker",icon:"🧠",desc:"Wrote 800+ word response"},
-  {title:"Research Master",icon:"📚",desc:"Cited 3+ external sources"},
-  {title:"Community Leader",icon:"👑",desc:"Received 5+ peer endorsements"},
-  {title:"Perfect Score",icon:"🎯",desc:"Achieved 100% on all requirements"}
-];
-
-const inspirationalQuotes = [
-  "McKenzie's story is not just a case study—it's a call to action. Your analysis matters.",
-  "Every insight you share contributes to dismantling systemic barriers. Your voice has power.",
-  "This isn't just an assignment. This is training for real-world advocacy that changes lives.",
-  "The system didn't fail McKenzie by accident. Your job is to expose the design flaws.",
-  "Critical thinking + compassionate action = systemic transformation. You're building both.",
-  "Your mastery of these concepts will make you an unstoppable force for social justice."
-];
-
-// --- USER PROGRESS STATE (Enhanced with all pillars)
-const userProgress = {
-  missions: {},
-  xp: 0,
-  level: 1,
-  badges: [],
-  collectibles: [],
-  streak: 0,
-  lastMissionDate: null,
-  benchmarks: {},
-  unlockDates: {},
-  masteryMultiplier: 1.0,
-  synthesisMissions: 0,
-  nexusChallenges: 0,
-  grandChallengeComplete: false,
-  criticalSuccessRate: 10,
-  skillTreeNodes: {}
-};
-
-// Pillars data hidden for discussion-focused interface
-const pillarsData = [
-  {
-    number: 1,
-    title: "SYSTEMIC SOLUTION GENERATOR",
-    color: "#00BFFF",
-    description: "Annihilate Structural Fragmentation",
-    inputPlaceholder: "Describe a systemic failure you've encountered...",
-    emoji: "✨"
-  },
-  {
-    number: 2,
-    title: "SILO ANNIHILATION MATRIX",
-    color: "#FF4500",
-    description: "Deconstruct Bureaucratic Entrenchment",
-    inputPlaceholder: "E.g., DCFS won't accept my documents via email",
-    emoji: "🔥"
-  },
-  {
-    number: 3,
-    title: "HOLISTIC CO-OCCURRENCE ENGINE",
-    color: "#FFD700",
-    description: "Align Resources to 24-Month Stability",
-    inputPlaceholder: "E.g., Chronic PTSD and inability to hold employment",
-    emoji: "🌟"
-  },
-  {
-    number: 4,
-    title: "TRAUMA DEFENSE STRATEGIST",
-    color: "#DC143C",
-    description: "Reforge Punitive Action into Systemic Failure",
-    inputPlaceholder: "E.g., DCFS citing 'General Neglect' after housing voucher error",
-    emoji: "🛡️"
-  },
-  {
-    number: 5,
-    title: "PEER RELATABILITY ENCODER",
-    color: "#9370DB",
-    description: "Convert Compliance Data into Human Commitment",
-    inputPlaceholder: "E.g., Client secured a part-time job using CalWORKs",
-    emoji: "💫"
-  },
-  {
-    number: 6,
-    title: "CRISIS DE-ESCALATION SCRIPTWRITER",
-    color: "#32CD32",
-    description: "Restore Relational Trust During Adversity",
-    inputPlaceholder: "E.g., 'I'm not answering your calls because you'll just take my child.'",
-    emoji: "🕊️"
-  },
-  {
-    number: 7,
-    title: "HYPER-NICHE RESOURCE MAPPER",
-    color: "#FF69B4",
-    description: "Locate Invisible Support Networks",
-    inputPlaceholder: "Describe your specific resource needs...",
-    emoji: "🗺️"
-  },
-  {
-    number: 8,
-    title: "ASCENDANT PERSONA ENCODER",
-    color: "#FFA07A",
-    description: "Transform Deficit Narratives into Asset Stories",
-    inputPlaceholder: "Share a challenge that demonstrates your resilience...",
-    emoji: "👑"
-  },
-  {
-    number: 9,
-    title: "EXECUTIVE SELF-ADVOCACY ARCHITECT",
-    color: "#00CED1",
-    description: "Craft Compelling System Navigation Scripts",
-    inputPlaceholder: "What do you need to communicate to authorities?",
-    emoji: "📢"
-  },
-  {
-    number: 10,
-    title: "GRAND UNIFICATION ENGINE",
-    color: "#FFD700",
-    description: "Synchronize Fragmented Service Requirements",
-    inputPlaceholder: "List the agencies you're working with...",
-    emoji: "🔗"
-  },
-  {
-    number: 11,
-    title: "LONGITUDINAL RISK ANALYZER",
-    color: "#FF6347",
-    description: "Predict and Preempt Systemic Failure Points",
-    inputPlaceholder: "Describe your current situation trajectory...",
-    emoji: "📊"
-  },
-  {
-    number: 12,
-    title: "MILESTONE PROPHET",
-    color: "#BA55D3",
-    description: "Generate Achievable 24-Month Roadmaps",
-    inputPlaceholder: "What's your primary stability goal?",
-    emoji: "🎯"
-  },
-  {
-    number: 13,
-    title: "QUANTUM ACCOUNTABILITY SCORER",
-    color: "#FF1493",
-    description: "Document Effort vs. Outcome Disparities",
-    inputPlaceholder: "What actions have you taken that weren't acknowledged?",
-    emoji: "⚡"
-  },
-  {
-    number: 14,
-    title: "DIGITAL DOSSIER INTEGRITY CHECKER",
-    color: "#9370DB",
-    description: "Audit Records for Accuracy and Bias",
-    inputPlaceholder: "Describe discrepancies in your official records...",
-    emoji: "🔍"
-  },
-  {
-    number: 15,
-    title: "VOCATIONAL NARRATIVE TRANSFORMER",
-    color: "#20B2AA",
-    description: "Reframe Employment Gaps as Strategic Growth",
-    inputPlaceholder: "Describe your work history and gaps...",
-    emoji: "💼"
-  },
-  {
-    number: 16,
-    title: "WARM HANDOFF COHESION ENFORCER",
-    color: "#FF8C00",
-    description: "Ensure Seamless Inter-Agency Transitions",
-    inputPlaceholder: "Which agencies need to coordinate for you?",
-    emoji: "🤝"
-  },
-  {
-    number: 17,
-    title: "EMPATHY BURNOUT SHIELD",
-    color: "#4169E1",
-    description: "Protect Advocates from Vicarious Trauma",
-    inputPlaceholder: "Describe the emotional weight you're carrying...",
-    emoji: "💚"
-  },
-  {
-    number: 18,
-    title: "PREVENTATIVE COST-BENEFIT MODELER",
-    color: "#FFD700",
-    description: "Quantify Intervention ROI for Policy Makers",
-    inputPlaceholder: "What intervention would have changed your trajectory?",
-    emoji: "💰"
-  },
-  {
-    number: 19,
-    title: "INSTITUTIONAL RAPPORT BUILDER",
-    color: "#8A2BE2",
-    description: "Generate Trust-Building Communication Templates",
-    inputPlaceholder: "Which institution do you need to rebuild trust with?",
-    emoji: "🏛️"
-  },
-  {
-    number: 20,
-    title: "NARRATIVE INTEGRITY AUDITOR",
-    color: "#DC143C",
-    description: "Identify Contradictions in System Documentation",
-    inputPlaceholder: "What inconsistencies have you noticed in your case?",
-    emoji: "📋"
-  },
-  {
-    number: 21,
-    title: "PUBLIC POLICY NARRATIVE SYNTHESIZER",
-    color: "#FF4500",
-    description: "Transform Personal Stories into Legislative Evidence",
-    inputPlaceholder: "Share your story for policy advocacy...",
-    emoji: "📜"
-  },
-  {
-    number: 22,
-    title: "LEGAL PRECEDENT NEXUS FINDER",
-    color: "#4B0082",
-    description: "Connect Your Case to Favorable Rulings",
-    inputPlaceholder: "Describe your legal challenge...",
-    emoji: "⚖️"
-  },
-  {
-    number: 23,
-    title: "MICRO-RESOURCE MOBILIZER",
-    color: "#00FA9A",
-    description: "Identify Immediate, Accessible Support Options",
-    inputPlaceholder: "What do you need within the next 48 hours?",
-    emoji: "🚀"
-  },
-  {
-    number: 24,
-    title: "POLICY CONFLICT IDENTIFIER",
-    color: "#FF6347",
-    description: "Expose Contradictory System Requirements",
-    inputPlaceholder: "What conflicting demands are you facing?",
-    emoji: "⚔️"
-];
-
-// AI RESPONSE TEMPLATES (kept for future expansion)
-const responseTemplates = [
-  {
-    prefix: "✨ SYSTEMIC ANALYSIS COMPLETE:",
-    templates: [
-      "The structural barrier you've identified reveals a critical failure in inter-agency coordination. Recommended action: Document this interaction with timestamps and submit a formal request for policy clarification. This creates an evidence trail for systemic reform advocacy.",
-      "Your experience exposes a fundamental contradiction between stated policy objectives and operational implementation. Strategic response: Request a supervisor review and cite the specific policy manual sections that support your position. This forces institutional accountability.",
-      "This situation demonstrates textbook bureaucratic fragmentation. Immediate tactic: Initiate parallel communication channels with all involved agencies simultaneously, CCing each on correspondence. This prevents the 'not our department' deflection."
-    ]
-  },
-  {
-    prefix: "🔥 SILO DEMOLITION PROTOCOL:",
-    templates: [
-      "The documentation barrier you're facing is administratively solvable. Action plan: Submit documents through ALL available channels simultaneously (email, fax, in-person, certified mail) and retain confirmation receipts. This eliminates the 'we never received it' excuse.",
-      "This is a classic inter-departmental coordination failure. Solution: Request a case coordination meeting with representatives from ALL involved agencies present. Document who attends and who refuses—refusal becomes evidence of systemic dysfunction.",
-      "Your case reveals process redundancy designed to exhaust rather than serve. Counter-strategy: Create a master tracking spreadsheet of all submission attempts, dates, recipients, and outcomes. This visual document becomes undeniable proof of institutional failure."
-    ]
-  },
-  {
-    prefix: "🌟 HOLISTIC INTEGRATION BLUEPRINT:",
-    templates: [
-      "The co-occurring challenges you've described require simultaneous intervention across multiple domains. Integrated approach: Secure mental health treatment documentation that explicitly connects your clinical needs to housing and employment accommodations. This creates a unified clinical narrative.",
-      "Your situation demonstrates why fragmented services fail. Recommended pathway: Identify a lead case manager who can serve as your advocate coordinator across all systems. If none exists, request one formally—this is often an available but unadvertised service.",
-      "The timeline mismatch between your recovery needs and institutional mandates is not your failure—it's a design flaw. Strategic response: Request deadline extensions based on clinical documentation. Most systems have waiver processes that caseworkers rarely mention."
-    ]
-  },
-  {
-    prefix: "🛡️ TRAUMA-INFORMED DEFENSE:",
-    templates: [
-      "The 'non-compliance' label applied to your situation is a failure of trauma-informed practice. Reframing strategy: Obtain clinical documentation that explicitly identifies the institutional interaction as a PTSD trigger. This shifts the narrative from defiance to disability accommodation.",
-      "Your case file language reveals punitive framing that ignores your trauma history. Intervention: Request a formal case review and submit a corrective statement that provides clinical context for each cited incident. You have the right to amend your record.",
-      "The system's response to your trauma symptoms is itself traumatizing—this is iatrogenic harm. Documentation approach: Work with your therapist to create a detailed timeline showing how institutional actions exacerbated your condition. This becomes evidence for legal or policy advocacy."
-    ]
-  },
-  {
-    prefix: "💫 PEER SUCCESS NARRATIVE:",
-    templates: [
-      "The achievement you've described should be prominently featured in your case documentation. Amplification strategy: Request that your case manager add a formal 'client success note' to your file. These positive markers often influence future decision-making in your favor.",
-      "Your progress demonstrates exactly the kind of incremental success that systems should celebrate. Leverage tactic: Ask if your story can be shared (anonymously if preferred) as a program success case. This shifts you from 'client' to 'evidence of program effectiveness.'",
-      "The effort you've invested is remarkable and should inform your service plan. Advocacy approach: Request a case plan review meeting where you present your own progress report. Taking ownership of your narrative changes power dynamics."
-    ]
-  },
-  {
-    prefix: "🕊️ DE-ESCALATION FRAMEWORK:",
-    templates: [
-      "The distrust you're experiencing is a rational response to prior institutional betrayal. Relationship repair script: 'I understand my guardedness seems like resistance, but it's actually self-protection based on past experiences. I want to work together, but I need specific assurances about [X].'",
-      "Your statement reveals a history of broken promises by the system. Bridge-building response: 'I'm willing to engage, but I need us to establish clear expectations and mutual accountability. Can we create a written agreement about communication and follow-through?'",
-      "The fear underlying your communication is valid and deserves acknowledgment. Trust-building template: 'I want to believe this time will be different. Help me understand specifically what safeguards are in place to prevent [previous negative outcome].'"
-    ]
-  }
-];
-
-// ACHIEVEMENTS SYSTEM
-const achievements = [
-  { id: 'explorer', name: '🗺️ System Explorer', condition: 'pillarsUsed', threshold: 3 },
-  { id: 'advocate', name: '📢 Self-Advocate', condition: 'pillarsUsed', threshold: 8 },
-  { id: 'architect', name: '🏛️ Ascension Architect', condition: 'pillarsUsed', threshold: 15 },
-  { id: 'master', name: '👑 Systemic Master', condition: 'pillarsUsed', threshold: 24 },
-  { id: 'scroller', name: '📜 Deep Reader', condition: 'scrollDepth', threshold: 80 },
-  { id: 'engaged', name: '⚡ Fully Engaged', condition: 'scrollDepth', threshold: 100 }
-];
-
-let userState = {
-  pillarsUsed: 0,
-  scrollDepth: 0,
-  unlockedAchievements: []
-};
-
-// MAIN INIT (ENTRY) - Full Transcendent System
-document.addEventListener('DOMContentLoaded', () => {
-  initializeSubtitleAnimation();
-  initializeCharts();
-  initializeScrollAnimations();
-  initializeStatCounters();
-  initializeStickyNav();
-  initializeScrollProgress();
-  loadUserProgress();
-  renderJourneyHud();
-  renderSkillTree();
-  renderTierDisplay();
-  renderTierGates();
-  renderBadgeShowcase();
-  renderCollectiblesInventory();
-  renderBenchmarksBoard();
-  renderMotivationalQuotes();
-});
-
-// LOAD/SAVE PROGRESS (in-memory, no localStorage due to sandbox)
-function loadUserProgress() {
-  // Progress persists only during session
-  console.log('User progress loaded:', userProgress);
-}
-
-function saveUserProgress() {
-  // Would save to localStorage if not sandboxed
-  console.log('User progress saved:', userProgress);
-}
-
-// SUBTITLE STAGGERED ANIMATION
-function initializeSubtitleAnimation() {
-  const subtitle = document.getElementById('subtitle');
-  const words = subtitle.querySelectorAll('span');
-  
-  words.forEach((word, index) => {
-    word.style.animationDelay = `${0.8 + (index * 0.1)}s`;
-  });
-}
-
-// ========================================
-// SKILL TREE VISUALIZATION (Arbor Scientia)
-// ========================================
-
-function renderSkillTree() {
-  const container = document.getElementById('skillTreeCanvas');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  // RENDER QUEST CARDS INSTEAD OF TREE
-  renderQuestCards(container);
-}
-
-function renderQuestCards(container) {
-  // Main Quest Card
-  const mainCard = createQuestCard(discussionQuests.mainQuest, 'main');
-  container.appendChild(mainCard);
-  
-  // Sub-Quest Cards
-  const subQuestsContainer = document.createElement('div');
-  subQuestsContainer.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px;margin:32px 0;';
-  
-  discussionQuests.subQuests.forEach(quest => {
-    const card = createQuestCard(quest, 'sub');
-    subQuestsContainer.appendChild(card);
-  });
-  
-  container.appendChild(subQuestsContainer);
-  
-  // Side Quests Section
-  const sideTitle = document.createElement('h3');
-  sideTitle.textContent = '✨ SIDE QUESTS: Bonus Engagement';
-  sideTitle.style.cssText = 'color:var(--plasma-gold);font-size:28px;font-weight:900;text-align:center;margin:48px 0 24px;text-transform:uppercase;';
-  container.appendChild(sideTitle);
-  
-  const sideQuestsContainer = document.createElement('div');
-  sideQuestsContainer.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;';
-  
-  discussionQuests.sideQuests.forEach(quest => {
-    const card = createQuestCard(quest, 'side');
-    sideQuestsContainer.appendChild(card);
-  });
-  
-  container.appendChild(sideQuestsContainer);
-}
-
-function createQuestCard(quest, type) {
-  const card = document.createElement('div');
-  const isUnlocked = quest.unlocked !== false;
-  const isCompleted = userProgress.missions[quest.id]?.completed;
-  
-  const colors = {
-    main: '#FFD700',
-    sub: '#00D9FF',
-    side: '#FF00FF'
-  };
-  
-  card.style.cssText = `
-    background: ${isCompleted ? 'rgba(50,205,50,0.2)' : isUnlocked ? 'rgba(0,191,255,0.1)' : 'rgba(84,110,122,0.1)'};
-    border: 3px solid ${colors[type]};
-    border-radius: 16px;
-    padding: ${type === 'main' ? '48px' : '32px'};
-    cursor: ${isUnlocked && !isCompleted ? 'pointer' : 'default'};
-    transition: all 0.3s ease;
-    opacity: ${isUnlocked ? 1 : 0.5};
-    position: relative;
-  `;
-  
-  if (isCompleted) {
-    card.style.boxShadow = '0 0 30px rgba(50,205,50,0.5)';
-  }
-  
-  const icon = type === 'main' ? quest.icon : type === 'sub' ? '🎯' : '⭐';
-  
-  card.innerHTML = `
-    <div style="text-align:center;margin-bottom:20px;">
-      <div style="font-size:${type === 'main' ? '64px' : '48px'};margin-bottom:12px;">${isCompleted ? '✅' : icon}</div>
-      <h3 style="color:${colors[type]};font-size:${type === 'main' ? '32px' : '24px'};font-weight:900;margin-bottom:12px;text-transform:uppercase;">${quest.title}</h3>
-      <p style="color:#E2E8F0;font-size:${type === 'main' ? '18px' : '16px'};line-height:1.6;margin-bottom:20px;">${quest.description}</p>
-    </div>
-    ${type === 'sub' ? `
-      <div style="background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;margin-bottom:20px;">
-        <div style="color:#FFD700;font-weight:700;font-size:14px;margin-bottom:12px;">📝 DISCUSSION PROMPT:</div>
-        <div style="color:#E2E8F0;font-size:15px;line-height:1.8;font-style:italic;">${quest.question}</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
-        <div>
-          <div style="color:#00FF88;font-size:13px;font-weight:700;">✔️ ${quest.requirements.paragraphs} paragraphs minimum</div>
-          <div style="color:#00FF88;font-size:13px;font-weight:700;margin-top:4px;">✔️ Cite ${quest.requirements.citations}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="color:#FFD700;font-size:24px;font-weight:900;">${quest.xpBase} XP</div>
-          <div style="color:#FF00FF;font-size:12px;">+${quest.xpBonus} bonus</div>
-        </div>
-      </div>
-    ` : type === 'side' ? `
-      <div style="text-align:center;margin-top:20px;">
-        <div style="color:#FFD700;font-size:28px;font-weight:900;margin-bottom:8px;">${quest.xpReward} XP</div>
-        <div style="color:#FF00FF;font-size:12px;font-weight:700;text-transform:uppercase;">Collectible: ${quest.collectible?.replace(/-/g, ' ') || 'Secret'}</div>
-      </div>
-    ` : ''}
-    ${isCompleted ? '<div style="position:absolute;top:20px;right:20px;background:rgba(50,205,50,0.3);padding:8px 16px;border-radius:20px;color:#00FF88;font-weight:800;font-size:12px;text-transform:uppercase;">✓ COMPLETE</div>' : ''}
-    ${!isUnlocked ? '<div style="position:absolute;top:20px;right:20px;background:rgba(84,110,122,0.3);padding:8px 16px;border-radius:20px;color:#546E7A;font-weight:800;font-size:12px;text-transform:uppercase;">🔒 LOCKED</div>' : ''}
-  `;
-  
-  if (isUnlocked && !isCompleted && type !== 'main') {
-    card.addEventListener('click', () => openDiscussionModal(quest));
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'translateY(-10px) scale(1.02)';
-      card.style.boxShadow = `0 20px 60px ${colors[type]}`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'none';
-      card.style.boxShadow = 'none';
-    });
-  }
-  
-  return card;
-}
-
-function openDiscussionModal(quest) {
-  let modal = document.getElementById('discussionModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.className = 'mission-modal';
-    modal.id = 'discussionModal';
-    document.body.appendChild(modal);
-  }
-  modal.classList.add('active');
-  
-  const progress = userProgress.missions[quest.id] || { completed: false, response: '', wordCount: 0, paragraphCount: 0 };
-  
-  modal.innerHTML = `
-    <div class="mission-content" style="max-width:1000px;">
-      <button class="mission-close" onclick="closeDiscussionModal()">×</button>
-      <div class="mission-header">
-        <div class="mission-title">🎯 ${quest.title}</div>
-      </div>
-      <div class="mission-description" style="font-size:18px;margin-bottom:24px;">${quest.description}</div>
-      
-      <div style="background:rgba(255,215,0,0.1);border-left:4px solid #FFD700;padding:24px;margin-bottom:32px;border-radius:8px;">
-        <div style="color:#FFD700;font-weight:800;font-size:16px;margin-bottom:12px;">📝 DISCUSSION PROMPT:</div>
-        <div style="color:#E2E8F0;font-size:17px;line-height:1.8;font-style:italic;">${quest.question}</div>
-      </div>
-      
-      <div style="margin-bottom:24px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <label style="color:#00D9FF;font-weight:700;font-size:16px;">Your Response:</label>
-          <div style="display:flex;gap:16px;font-size:13px;">
-            <span style="color:#FFD700;">Paragraphs: <strong id="paragraphCounter">0</strong>/${quest.requirements.paragraphs}</span>
-            <span style="color:#FF00FF;">Words: <strong id="wordCounter">0</strong></span>
-          </div>
-        </div>
-        <textarea 
-          id="discussionResponse" 
-          placeholder="Write your analysis here... Remember to cite specific moments from the documentary and integrate concepts from the readings."
-          style="width:100%;min-height:400px;padding:20px;background:rgba(0,0,0,0.5);border:2px solid #00D9FF;border-radius:12px;color:white;font-size:16px;font-family:var(--font-family-base);line-height:1.8;resize:vertical;"
-        >${progress.response || ''}</textarea>
-        <div id="hiddenObjectivesFound" style="margin-top:12px;"></div>
-      </div>
-      
-      <div style="background:rgba(0,191,255,0.05);padding:20px;border-radius:12px;margin-bottom:24px;">
-        <div style="color:#00FF88;font-size:14px;font-weight:700;margin-bottom:12px;">✔️ REQUIREMENTS:</div>
-        <div style="color:#E2E8F0;font-size:14px;line-height:2;">
-          • Minimum ${quest.requirements.paragraphs} paragraphs (substantive analysis)<br>
-          • Cite specific ${quest.requirements.citations}<br>
-          • Integrate concepts: ${quest.requirements.concepts?.join(', ') || quest.requirements.framework || quest.requirements.strategies}
-        </div>
-      </div>
-      
-      <div style="display:flex;gap:16px;">
-        <button onclick="submitDiscussionResponse('${quest.id}')" class="complete-mission-btn" style="flex:1;">🚀 Submit Response (+${quest.xpBase} XP)</button>
-        <button onclick="saveDraft('${quest.id}')" style="padding:16px 32px;background:rgba(255,255,255,0.1);border:2px solid #777;border-radius:12px;color:#E2E8F0;font-weight:700;cursor:pointer;">Save Draft</button>
-      </div>
-    </div>
-  `;
-  
-  // Real-time analysis
-  const textarea = document.getElementById('discussionResponse');
-  textarea.addEventListener('input', () => analyzeResponse(quest));
-  analyzeResponse(quest);
-}
-
-function analyzeResponse(quest) {
-  const textarea = document.getElementById('discussionResponse');
-  const text = textarea.value;
-  
-  // Count paragraphs (double line breaks)
-  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 50);
-  const paragraphCount = paragraphs.length;
-  
-  // Count words
-  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
-  const wordCount = words.length;
-  
-  document.getElementById('paragraphCounter').textContent = paragraphCount;
-  document.getElementById('wordCounter').textContent = wordCount;
-  
-  // Check for hidden objectives
-  const foundObjectives = [];
-  hiddenObjectives.forEach(obj => {
-    if (text.toLowerCase().includes(obj.trigger.toLowerCase())) {
-      if (!foundObjectives.find(f => f.id === obj.id)) {
-        foundObjectives.push(obj);
-      }
-    }
-  });
-  
-  const objectivesDiv = document.getElementById('hiddenObjectivesFound');
-  if (foundObjectives.length > 0) {
-    objectivesDiv.innerHTML = foundObjectives.map(obj => 
-      `<div style="display:inline-block;margin:4px 8px 4px 0;padding:8px 16px;background:rgba(255,215,0,0.2);border:2px solid #FFD700;border-radius:20px;color:#FFD700;font-size:12px;font-weight:700;animation:badgePulse 0.6s ease;">
-        ✨ HIDDEN OBJECTIVE: ${obj.badge} (+${obj.rewardXP} XP)
-      </div>`
-    ).join('');
-  }
-  
-  return { paragraphCount, wordCount, foundObjectives };
-}
-
-window.submitDiscussionResponse = function(questId) {
-  const quest = discussionQuests.subQuests.find(q => q.id === questId) || discussionQuests.sideQuests.find(q => q.id === questId);
-  if (!quest) return;
-  
-  const textarea = document.getElementById('discussionResponse');
-  const text = textarea.value;
-  const analysis = analyzeResponse(quest);
-  
-  // Validation
-  if (analysis.paragraphCount < quest.requirements.paragraphs) {
-    showCelebrationToast(`⚠️ Need ${quest.requirements.paragraphs - analysis.paragraphCount} more paragraph(s)!`, 2000);
-    return;
-  }
-  
-  if (analysis.wordCount < 300) {
-    showCelebrationToast('⚠️ Response too short. Aim for substantive analysis!', 2000);
-    return;
-  }
-  
-  // Save response
-  userProgress.missions[questId] = {
-    completed: true,
-    response: text,
-    wordCount: analysis.wordCount,
-    paragraphCount: analysis.paragraphCount,
-    submittedAt: Date.now()
-  };
-  
-  // Award XP
-  let totalXP = quest.xpBase;
-  
-  // Bonus for exceptional length
-  if (analysis.wordCount > 600) {
-    totalXP += quest.xpBonus;
-    showCelebrationToast(`🌟 EXCEPTIONAL DEPTH! +${quest.xpBonus} Bonus XP!`, 2000);
-  }
-  
-  // Hidden objectives XP
-  analysis.foundObjectives.forEach(obj => {
-    totalXP += obj.rewardXP;
-    if (!userProgress.badges.includes(obj.badge)) {
-      userProgress.badges.push(obj.badge);
-    }
-  });
-  
-  updateXP(totalXP);
-  updateStreak();
-  
-  // Unlock next quest
-  if (questId === 'sub-quest-1') {
-    const subQuest2 = discussionQuests.subQuests.find(q => q.id === 'sub-quest-2');
-    if (subQuest2) subQuest2.unlocked = true;
-  }
-  
-  checkTierAdvancement();
-  renderJourneyHud();
-  renderSkillTree();
-  renderTierDisplay();
-  renderBadgeShowcase();
-  
-  closeDiscussionModal();
-  playSuccessSound();
-  showCelebrationToast(`🎆 QUEST COMPLETE! +${totalXP} XP EARNED!`);
-  
-  // Unlock collectible
-  if (quest.collectible) {
-    const collectible = collectibleArtifacts.find(c => c.id === quest.collectible);
-    if (collectible && !userProgress.collectibles.find(uc => uc.id === collectible.id)) {
-      userProgress.collectibles.push(collectible);
-      playCollectibleSound();
-      setTimeout(() => showCelebrationToast(`🏆 Collectible Unlocked: ${collectible.name}!`, 3000), 1000);
-    }
-  }
-};
-
-window.saveDraft = function(questId) {
-  const textarea = document.getElementById('discussionResponse');
-  const text = textarea.value;
-  
-  userProgress.missions[questId] = userProgress.missions[questId] || {};
-  userProgress.missions[questId].response = text;
-  userProgress.missions[questId].draft = true;
-  
-  showCelebrationToast('💾 Draft saved!', 1500);
-};
-
-window.closeDiscussionModal = function() {
-  document.getElementById('discussionModal')?.classList.remove('active');
-};
-
-function renderSkillTreeLegacy() {
-  const container = document.getElementById('skillTreeCanvas');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  // Create skill tree visual
-  skillTreeBranches.forEach(branch => {
-    const branchDiv = document.createElement('div');
-    branchDiv.style.cssText = `
-      position: absolute;
-      left: ${branch.x}px;
-      top: ${branch.y}px;
-    `;
-    
-    // Branch title
-    const title = document.createElement('div');
-    title.textContent = branch.name;
-    title.style.cssText = `
-      color: ${branch.color};
-      font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 16px;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    `;
-    branchDiv.appendChild(title);
-    
-    // Nodes in branch
-    branch.nodes.forEach((node, idx) => {
-      const nodeDiv = document.createElement('div');
-      const unlocked = isNodeUnlocked(node);
-      const completed = isNodeCompleted(node);
-      
-      nodeDiv.style.cssText = `
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 4px solid ${branch.color};
-        background: ${completed ? 'rgba(50,205,50,0.3)' : 'rgba(0,0,0,0.5)'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 12px auto;
-        cursor: ${unlocked ? 'pointer' : 'not-allowed'};
-        opacity: ${unlocked ? 1 : 0.4};
-        transition: all 0.3s ease;
-        position: relative;
-      `;
-      
-      if (node.nexus) {
-        nodeDiv.style.boxShadow = `0 0 30px ${branch.color}`;
-        nodeDiv.style.border = `6px solid ${branch.color}`;
-      }
-      
-      nodeDiv.innerHTML = `
-        <div style="text-align:center;">
-          <div style="font-size:24px;">${completed ? '✓' : node.nexus ? '💫' : '◆'}</div>
-          <div style="font-size:10px;color:white;font-weight:700;">${node.xp}XP</div>
-        </div>
-      `;
-      
-      nodeDiv.title = `${node.title}\n${node.xp} XP\nStatus: ${completed ? 'Complete' : unlocked ? 'Available' : 'Locked'}`;
-      
-      if (unlocked && !completed) {
-        nodeDiv.addEventListener('click', () => openNodeMissions(node));
-        nodeDiv.addEventListener('mouseenter', () => {
-          nodeDiv.style.transform = 'scale(1.2) translateY(-5px)';
-          nodeDiv.style.boxShadow = `0 10px 40px ${branch.color}`;
-        });
-        nodeDiv.addEventListener('mouseleave', () => {
-          nodeDiv.style.transform = 'scale(1)';
-          nodeDiv.style.boxShadow = 'none';
-        });
-      }
-      
-      branchDiv.appendChild(nodeDiv);
-    });
-    
-    container.appendChild(branchDiv);
-  });
-}
-
-function isNodeUnlocked(node) {
-  if (node.unlocked) return true;
-  if (!node.requires || node.requires.length === 0) return true;
-  return node.requires.every(reqId => userProgress.skillTreeNodes[reqId]);
-}
-
-function isNodeCompleted(node) {
-  return userProgress.skillTreeNodes[node.id] === true;
-}
-
-function openNodeMissions(node) {
-  // Open mission modal for this node's associated missions
-  if (node.missions && node.missions.length > 0) {
-    const missionId = node.missions[0];
-    handleOpenMissionModal(missionId);
-  }
-}
-
-// Legacy roadmap function (hidden)
-function renderRoadmapLegacy() {
-  // Disabled for discussion platform
-  return;
-}
-
-// ROADMAP VISUAL (legacy, disabled for discussion platform)
-function renderRoadmap() {
-  // Now handled by renderSkillTree()
-  renderSkillTree();
-}
-
-function isMissionUnlocked(missionId) {
-  // Sequential unlocking: Mission 1 is unlocked by default, others unlock when previous completes
-  if (missionId === 1) return true;
-  const prev = majorMissions.find(m=>m.id===missionId-1);
-  if(!prev) return false;
-  return userProgress.missions[prev.id]?.completed;
-}
-
-function isMissionComplete(missionId) {
-  return userProgress.missions[missionId]?.completed;
-}
-
-// MISSION LAYER/QUESTS (Full Modal)
-function handleOpenMissionModal(missionId) {
-  if (!isMissionUnlocked(missionId)) return;
-  const mission = majorMissions.find(m => m.id === missionId);
-  renderMissionModal(mission);
-}
-
-function renderMissionModal(mission) {
-  let modal = document.getElementById('missionModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.className = 'mission-modal';
-    modal.id = 'missionModal';
-    document.body.appendChild(modal);
-  }
-  modal.classList.add('active');
-
-  // Sub-missions checked status:
-  const progress = userProgress.missions[mission.id] || { completed: false, stepStatus: [] };
-
-  let html = `<div class="mission-content">
-    <button class="mission-close" onclick="closeMissionModal()">×</button>
-    <div class="mission-header">
-      <div class="mission-title">${mission.icon} ${mission.title}</div>
-    </div>
-    <div class="mission-description">Epic quest. Complete each sub-mission to earn: <span style='color:gold;font-weight:bold;'>${mission.badge.replace(/-/g,' ').replace(/\b\w/g, l=>l.toUpperCase())}</span>.</div>
-  `;
-
-  let stepCount = 0, completeCount = 0;
-  mission.sub_missions.forEach((sub, sidx) => {
-    html += `<div class="sub-mission">
-      <div class="sub-mission-title">${String.fromCharCode(65+sidx)}. ${sub.title}</div>
-      <div class="sub-mission-steps">`;
-    sub.steps.forEach((step, stidx) => {
-      const checked = progress.stepStatus && progress.stepStatus[sidx] ? progress.stepStatus[sidx][stidx] : false;
-      if (checked) completeCount++;
-      stepCount++;
-      html += `<div class="quest-step"><div class="step-checkbox${checked?' checked':''}" data-mission="${mission.id}" data-si="${sidx}" data-sti="${stidx}" tabindex="0"></div>${step}</div>`;
-    });
-    html += '</div></div>';
-  });
-  const percent = (stepCount ? Math.round(100*completeCount/stepCount) : 0);
-  html += `<div class="mission-progress-bar"><div class="mission-progress-fill" style="width:${percent}%"></div><div class="mission-progress-text">${percent}% Complete</div></div>`;
-  html += `<button class="complete-mission-btn" onclick="completeMajorMission(${mission.id})" ${(percent<100||progress.completed)?'disabled':''}>Complete Mission &amp; Claim Badge</button>`;
-
-  html += '</div>';
-  modal.innerHTML = html;
-  modal.querySelectorAll('.step-checkbox').forEach(el => {
-    el.addEventListener('click', () => toggleStepCheckbox(el));
-    el.addEventListener('keydown', (e) => { if (e.key=="Enter"||e.key==" ") toggleStepCheckbox(el); });
-  });
-}
-window.closeMissionModal = function() {
-  document.getElementById('missionModal')?.classList.remove('active');
-};
-
-function toggleStepCheckbox(el) {
-  const missionId = +el.dataset.mission, si = +el.dataset.si, sti = +el.dataset.sti;
-  const mp = userProgress.missions[missionId] = userProgress.missions[missionId]||{completed:false,stepStatus:[]};
-  mp.stepStatus[si] = mp.stepStatus[si]||[]; mp.stepStatus[si][sti] = !mp.stepStatus[si][sti];
-  renderMissionModal(majorMissions.find(x=>x.id===missionId));
-  updateProgress();
-}
-window.completeMajorMission = function(missionId) {
-  const mp = userProgress.missions[missionId];
-  if (!mp || mp.completed) return;
-  mp.completed = true;
-  
-  // DOPAMINE HIT: Variable Reward System
-  const isCritical = Math.random() < (userProgress.criticalSuccessRate / 100);
-  const rewards = generateMissionReward(missionId, isCritical);
-  
-  // NEUROCHEMICAL TRIGGER: Success sound
-  playSuccessSound();
-  
-  addBadgeForMission(missionId);
-  animateBadgeUnlock(missionId);
-  
-  // Award XP with mastery multiplier
-  const finalXP = Math.floor(rewards.xp * userProgress.masteryMultiplier);
-  updateXP(finalXP);
-  
-  // Award collectibles
-  rewards.collectibles.forEach(c => {
-    if (!userProgress.collectibles.find(uc => uc.id === c.id)) {
-      userProgress.collectibles.push(c);
-      playCollectibleSound();
-      if (c.effect && c.effect.includes('Multiplier')) {
-        userProgress.masteryMultiplier += 0.5;
-      }
-    }
-  });
-  
-  updateStreak();
-  updateSkillTreeNode(missionId);
-  checkTierAdvancement();
-  
-  renderJourneyHud();
-  renderSkillTree();
-  renderTierDisplay();
-  renderBadgeShowcase();
-  renderCollectiblesInventory();
-  renderBenchmarksBoard();
-  closeMissionModal();
-  
-  const msg = isCritical ? '🎉 CRITICAL SUCCESS! DOUBLE XP + RARE ARTIFACT!' : `Mission Complete! +${finalXP} XP!`;
-  showCelebrationToast(msg);
-  
-  // ADRENALINE: Unlock next nodes
-  if (isCritical) {
-    showCelebrationToast('✨ Bonus collectibles awarded!', 3000);
-  }
-};
-
-function updateSkillTreeNode(missionId) {
-  // Mark all nodes containing this mission as complete
-  // Legacy code hidden
-  /*
-  skillTreeBranches.forEach(branch => {
-    const branchDiv = document.createElement('div');
-    branchDiv.style.cssText = `
-      position: absolute;
-      left: ${branch.x}px;
-      top: ${branch.y}px;
-    `;
-    
-    // Branch title
-    const title = document.createElement('div');
-    title.textContent = branch.name;
-    title.style.cssText = `
-      color: ${branch.color};
-      font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 16px;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    `;
-    branchDiv.appendChild(title);
-    
-    // Nodes in branch
-    branch.nodes.forEach((node, idx) => {
-      const nodeDiv = document.createElement('div');
-      const unlocked = isNodeUnlocked(node);
-      const completed = isNodeCompleted(node);
-      
-      nodeDiv.style.cssText = `
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 4px solid ${branch.color};
-        background: ${completed ? 'rgba(50,205,50,0.3)' : 'rgba(0,0,0,0.5)'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 12px auto;
-        cursor: ${unlocked ? 'pointer' : 'not-allowed'};
-        opacity: ${unlocked ? 1 : 0.4};
-        transition: all 0.3s ease;
-        position: relative;
-      `;
-      
-      if (node.nexus) {
-        nodeDiv.style.boxShadow = `0 0 30px ${branch.color}`;
-        nodeDiv.style.border = `6px solid ${branch.color}`;
-      }
-      
-      nodeDiv.innerHTML = `
-        <div style="text-align:center;">
-          <div style="font-size:24px;">${completed ? '✓' : node.nexus ? '💫' : '◆'}</div>
-          <div style="font-size:10px;color:white;font-weight:700;">${node.xp}XP</div>
-        </div>
-      `;
-      
-      nodeDiv.title = `${node.title}\n${node.xp} XP\nStatus: ${completed ? 'Complete' : unlocked ? 'Available' : 'Locked'}`;
-      
-      if (unlocked && !completed) {
-        nodeDiv.addEventListener('click', () => openNodeMissions(node));
-        nodeDiv.addEventListener('mouseenter', () => {
-          nodeDiv.style.transform = 'scale(1.2) translateY(-5px)';
-          nodeDiv.style.boxShadow = `0 10px 40px ${branch.color}`;
-        });
-        nodeDiv.addEventListener('mouseleave', () => {
-          nodeDiv.style.transform = 'scale(1)';
-          nodeDiv.style.boxShadow = 'none';
-        });
-      }
-      
-      branchDiv.appendChild(nodeDiv);
-    });
-    
-    container.appendChild(branchDiv);
-  });
-  */
-    branch.nodes.forEach(node => {
-      if (node.missions && node.missions.includes(missionId)) {
-        userProgress.skillTreeNodes[node.id] = true;
-        if (node.nexus) {
-          userProgress.nexusChallenges++;
-          userProgress.masteryMultiplier += 0.2;
-        }
-      }
-    });
-  });
-}
-
-function checkTierAdvancement() {
-  const nextTier = getNextTier();
-  if (!nextTier) return;
-  
-  if (userProgress.xp >= nextTier.xpMin && checkTierRequirements(nextTier)) {
-    showTierUpModal(nextTier);
-  }
-}
-
-function showTierUpModal(tier) {
-  // NEUROCHEMICAL TRIGGER: Level up sound
-  playLevelUpSound();
-  
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
-    z-index: 3000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.5s ease;
-  `;
-  
-  modal.innerHTML = `
-    <div style="background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,0,255,0.2));border:4px solid ${tier.color};border-radius:20px;padding:64px;text-align:center;max-width:600px;animation:modalBounce 0.6s ease;">
-      <div style="font-size:80px;margin-bottom:24px;">${tier.badge}</div>
-      <h2 style="font-size:48px;font-weight:900;color:${tier.color};margin-bottom:16px;text-transform:uppercase;">TIER UP!</h2>
-      <h3 style="font-size:36px;font-weight:800;color:white;margin-bottom:24px;">${tier.name}</h3>
-      <p style="font-size:18px;color:#E2E8F0;margin-bottom:32px;line-height:1.8;">${tier.requirements.description}</p>
-      <div style="margin-bottom:32px;">
-        <div style="font-size:16px;color:#FFD700;font-weight:700;margin-bottom:12px;">NEW ABILITIES UNLOCKED:</div>
-        ${tier.abilities.map(a => `<div style="color:#00FF88;font-size:14px;margin:8px 0;">✓ ${a}</div>`).join('')}
-      </div>
-      <button onclick="this.parentElement.parentElement.remove()" style="padding:16px 48px;background:linear-gradient(135deg,#00D9FF,#FF00FF);border:none;border-radius:50px;color:white;font-size:18px;font-weight:800;cursor:pointer;text-transform:uppercase;">EMBRACE YOUR POWER</button>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  // Play sound effect (if available)
-  setTimeout(() => modal.remove(), 8000);
-}
-
-function updateProgress(){
-  // Called after check or mission completion
-  renderJourneyHud();
-  renderRoadmap();
-  renderBadgeShowcase();
-  renderBenchmarksBoard();
-}
-
-// BADGES
-function addBadgeForMission(missionId){
-  const mission = majorMissions.find(m=>m.id===missionId);
-  if (!mission) return;
-  if (!userProgress.badges.includes(mission.badge)) {
-    userProgress.badges.push(mission.badge);
-    userProgress.unlockDates[mission.badge]=Date.now();
-    // Could trigger collectible/secret logic too!
-  }
-}
-
-function animateBadgeUnlock(missionId) {
-  // For demonstration: flash or shake badge in showcase
-}
-
-// XP/LEVEL SYSTEM
-function updateXP(amount){
-  userProgress.xp += amount;
-  if(userProgress.xp > 0){
-    userProgress.level=Math.floor(userProgress.xp/200)+1;
-  }
-}
-
-// STREAK SYSTEM
-function updateStreak(){
-  const today = new Date().toDateString();
-  if(userProgress.lastMissionDate === today){
-    // already completed today
-    return;
-  }
-  if(userProgress.lastMissionDate && (new Date(today)-new Date(userProgress.lastMissionDate))===86400000){
-    userProgress.streak++;
-  } else {
-    userProgress.streak = 1;
-  }
-  userProgress.lastMissionDate = today;
-}
-
-// HUD (Enhanced with all metrics)
-function renderJourneyHud() {
-  document.getElementById('playerLevel').textContent = userProgress.level;
-  document.getElementById('playerXP').textContent = userProgress.xp;
-  document.getElementById('missionsComplete').textContent = `${userProgress.badges.length}/${majorMissions.length}`;
-  document.getElementById('streakCount').textContent = userProgress.streak;
-  document.getElementById('badgeCount').textContent = userProgress.badges.length;
-  document.getElementById('xpBar').style.width = ((userProgress.xp%200)/2)+'%';
-}
-
-// TIER DISPLAY
-function renderTierDisplay() {
-  const current = getCurrentTier();
-  const next = getNextTier();
-  
-  document.getElementById('currentTierName').textContent = current.name;
-  document.getElementById('tierDescription').textContent = current.requirements.description;
-  
-  if (next) {
-    const progress = (userProgress.xp - current.xpMin) / (next.xpMin - current.xpMin);
-    document.getElementById('tierProgressBar').style.width = `${Math.min(progress * 100, 100)}%`;
-    
-    const reqsEl = document.getElementById('tierRequirements');
-    reqsEl.innerHTML = `<strong>Requirements for ${next.name}:</strong><br>` + 
-      Object.entries(next.requirements).filter(([k,v]) => k !== 'description').map(([k,v]) => {
-        if (typeof v === 'number') {
-          const current = k === 'missionsCompleted' ? userProgress.badges.length :
-                         k === 'synthesisMissions' ? userProgress.synthesisMissions :
-                         k === 'nexusChallenges' ? userProgress.nexusChallenges :
-                         k === 'streakDays' ? userProgress.streak :
-                         k === 'uniqueCollectibles' ? userProgress.collectibles.length : 0;
-          return `${k}: ${current}/${v}`;
-        }
-        return '';
-      }).filter(s => s).join(' • ');
-  }
-}
-
-// TIER GATES RENDERING
-function renderTierGates() {
-  const container = document.getElementById('tierGatesContainer');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  tierStructure.forEach(tier => {
-    const achieved = userProgress.xp >= tier.xpMin;
-    const canAttempt = userProgress.xp >= tier.xpMin && checkTierRequirements(tier);
-    
-    const card = document.createElement('div');
-    card.style.cssText = `
-      background: rgba(15,10,31,0.9);
-      border: 3px solid ${achieved ? tier.color : '#546E7A'};
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      opacity: ${achieved ? 1 : 0.6};
-      transition: all 0.3s ease;
-    `;
-    
-    card.innerHTML = `
-      <div style="font-size:64px;margin-bottom:16px;">${tier.badge}</div>
-      <h3 style="color:${tier.color};font-size:24px;font-weight:900;margin-bottom:12px;">${tier.name}</h3>
-      <p style="font-size:14px;color:#E2E8F0;margin-bottom:16px;">${tier.requirements.description}</p>
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);">
-        <div style="font-size:12px;color:#FFD700;font-weight:700;margin-bottom:8px;">ABILITIES:</div>
-        ${tier.abilities.map(a => `<div style="font-size:11px;color:#00FF88;margin:4px 0;">• ${a}</div>`).join('')}
-      </div>
-      ${canAttempt && tier.validation !== 'auto' ? `
-        <button onclick="attemptTierValidation('${tier.name}')" style="margin-top:16px;padding:12px 24px;background:${tier.color};border:none;border-radius:8px;color:white;font-weight:800;cursor:pointer;text-transform:uppercase;">ATTEMPT GATE</button>
-      ` : achieved ? `
-        <div style="margin-top:16px;padding:8px 16px;background:rgba(50,205,50,0.2);border:2px solid #32CD32;border-radius:20px;color:#32CD32;font-weight:700;font-size:12px;">✓ ACHIEVED</div>
-        ${tierStructure.indexOf(tier) >= 3 ? `<button onclick="generateCertificate()" style="margin-top:12px;padding:10px 20px;background:linear-gradient(135deg,#FFD700,#FF00FF);border:none;border-radius:8px;color:white;font-weight:700;cursor:pointer;text-transform:uppercase;font-size:11px;">🏆 DOWNLOAD CERTIFICATE</button>` : ''}
-      ` : `
-        <div style="margin-top:16px;padding:8px 16px;background:rgba(84,110,122,0.2);border:2px solid #546E7A;border-radius:20px;color:#546E7A;font-weight:700;font-size:12px;">🔒 LOCKED</div>
-      `}
-    `;
-    
-    container.appendChild(card);
-  });
-}
-
-window.attemptTierValidation = function(tierName) {
-  showCelebrationToast('🎯 Validation Scenario: Coming in Phase 2!');
-};
-
-// CERTIFICATE GENERATION (Grandmaster+)
-function generateCertificate() {
-  const tier = getCurrentTier();
-  if (tierStructure.indexOf(tier) < 3) {
-    showCelebrationToast('🔒 Certificates available at Grandmaster tier and above');
-    return;
-  }
-  
-  const verificationCode = generateVerificationCode();
-  const dateStr = new Date().toLocaleDateString();
-  
-  const certificateHTML = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Certificate of Mastery - Ascension Architect</title>
-  <style>
-    body { font-family: 'Georgia', serif; text-align: center; padding: 60px; background: linear-gradient(135deg, #0B1A2D, #1a1a2e); color: white; }
-    .certificate { max-width: 800px; margin: 0 auto; padding: 60px; background: white; color: #0B1A2D; border: 10px solid #FFD700; box-shadow: 0 20px 60px rgba(255,215,0,0.5); }
-    h1 { font-size: 48px; color: #FFD700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-    .badge { font-size: 80px; margin: 20px 0; }
-    .tier { font-size: 36px; font-weight: bold; color: ${tier.color}; margin: 20px 0; }
-    .name { font-size: 32px; font-weight: bold; margin: 30px 0; border-bottom: 2px solid #FFD700; display: inline-block; padding: 10px 40px; }
-    .description { font-size: 18px; line-height: 1.8; margin: 30px 0; }
-    .verification { margin-top: 40px; padding: 20px; background: #f5f5f5; border-radius: 10px; }
-    .code { font-family: monospace; font-size: 16px; color: #00D9FF; font-weight: bold; letter-spacing: 2px; }
-    .date { font-style: italic; margin-top: 20px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOLLYWOOD'S FINEST: God-Mode Gamified Discussion Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+/* DESIGN SYSTEM FOUNDATION */
+:root {
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+  --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-base: 16px;
+  --line-height-normal: 1.6;
+  --space-16: 16px;
+  --radius-lg: 12px;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* GAMIFICATION PALETTE - TRANSCENDENT */
+  --deep-space-blue: #0B1A2D;
+  --electric-cyan: #00D9FF;
+  --plasma-gold: #FFD700;
+  --crimson-surge: #FF4444;
+  --emerald-glow: #00FF88;
+  --quest-gold: #FFD700;
+  --quest-legendary: #FF00FF;
+  --quest-epic: #9370DB;
+  --quest-rare: #00BFFF;
+  --quest-common: #32CD32;
+  --mission-active: #FF4500;
+  --mission-complete: #32CD32;
+  --mission-locked: #546E7A;
+  --badge-glow: rgba(255, 215, 0, 0.6);
+  --progress-bar: linear-gradient(90deg, #00BFFF, #FF00FF, #FFD700);
+  --bg-dark: #0F0A1F;
+  --bg-darker: #08051A;
+  --bg-deepest: #020014;
+  --text-light: #E2E8F0;
+  --text-bright: #F8FAFC;
+  --streak-fire: #FF6B35;
+  --achievement-border: #FFD700;
+  --cyan-clarity: #00D9FF;
+  --magenta-niche: #FF00FF;
+  --gold-achieve: #FFD700;
+  --orange-action: #FF8C00;
+  --lime-growth: #00FF88;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background: linear-gradient(135deg, var(--bg-deepest) 0%, var(--bg-darker) 50%, var(--bg-dark) 100%);
+  color: var(--text-light);
+  overflow-x: hidden;
+  line-height: var(--line-height-normal);
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(0, 191, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* SCROLL PROGRESS INDICATOR */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cyan-clarity), var(--magenta-niche), var(--gold-achieve));
+  z-index: 9999;
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.8);
+}
+
+/* STICKY NAVIGATION */
+.sticky-nav {
+  position: fixed;
+  top: -100px;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 16px 0;
+  z-index: 1000;
+  transition: top 0.3s var(--ease-standard);
+  border-bottom: 1px solid rgba(0, 191, 255, 0.3);
+}
+
+.sticky-nav.visible {
+  top: 0;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--cyan-clarity), var(--magenta-niche));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-link {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--cyan-clarity);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* JOURNEY STATS HUD */
+.journey-hud {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(15, 10, 31, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid var(--quest-gold);
+  z-index: 1001;
+  min-width: 250px;
+  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+}
+
+.hud-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--quest-gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.hud-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.hud-label {
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.hud-value {
+  color: var(--quest-gold);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.streak-flame {
+  display: inline-block;
+  animation: flameFlicker 1s ease-in-out infinite;
+}
+
+@keyframes flameFlicker {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-5deg); }
+  75% { transform: scale(1.1) rotate(5deg); }
+}
+
+.level-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.level-fill {
+  height: 100%;
+  background: var(--progress-bar);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* HERO SECTION - CAPTIVATING ENTRANCE */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 64px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, rgba(0, 191, 255, 0.15) 0%, transparent 70%);
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  opacity: 0;
+  animation: fadeInScale 1.2s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.hero-title {
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--cyan-clarity), var(--magenta-niche), var(--gold-achieve));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 60px rgba(0, 191, 255, 0.5);
+}
+
+.hero-subtitle {
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 700;
+  margin-bottom: 48px;
+  color: var(--text-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-subtitle span {
+  display: inline-block;
+  opacity: 0;
+  animation: wordReveal 0.5s ease-out forwards;
+}
+
+@keyframes wordReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-mission {
+  font-size: clamp(18px, 2.5vw, 24px);
+  line-height: 1.8;
+  margin-bottom: 48px;
+  color: var(--text-light);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: pulseMission 3s ease-in-out infinite;
+}
+
+@keyframes pulseMission {
+  0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+  50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+}
+
+.scroll-indicator {
+  margin-top: 64px;
+  animation: bounceArrow 2s ease-in-out infinite;
+}
+
+.scroll-arrow {
+  width: 40px;
+  height: 40px;
+  border-left: 3px solid var(--cyan-clarity);
+  border-bottom: 3px solid var(--cyan-clarity);
+  transform: rotate(-45deg);
+  filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.8));
+}
+
+@keyframes bounceArrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(15px); }
+}
+
+/* SECTION STYLING */
+.section {
+  padding: 100px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-title {
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--gold-achieve), var(--orange-action));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-description {
+  font-size: clamp(18px, 2vw, 22px);
+  text-align: center;
+  margin-bottom: 64px;
+  color: var(--text-light);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.8;
+}
+
+/* VIDEO EMBED */
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 64px auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--cyan-clarity);
+}
+
+.video-container::before {
+  content: '';
+  display: block;
+  padding-top: 56.25%;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* STATISTICS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+  margin: 64px 0;
+}
+
+.stat-card {
+  background: rgba(0, 191, 255, 0.1);
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  border: 2px solid var(--cyan-clarity);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(0, 191, 255, 0.3);
+}
+
+.stat-value {
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--gold-achieve);
+  display: block;
+  margin-bottom: 16px;
+}
+
+.stat-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* CHARTS */
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 48px;
+  margin: 64px 0;
+}
+
+.chart-wrapper {
+  background: rgba(15, 23, 42, 0.8);
+  padding: 32px;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 69, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.chart-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--orange-action);
+  text-align: center;
+}
+
+.chart-canvas {
+  position: relative;
+  height: 300px;
+}
+
+/* PILLARS GRID */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+  margin-top: 64px;
+}
+
+.pillar-card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 16px;
+  padding: 32px;
+  border-left: 6px solid;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pillar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.pillar-card:hover::before {
+  opacity: 1;
+}
+
+.pillar-card:hover {
+  transform: translateY(-10px) rotateX(2deg) rotateY(2deg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pillar-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pillar-emoji {
+  font-size: 32px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.pillar-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+
+.pillar-number {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold-achieve);
+  background: rgba(255, 215, 0, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.pillar-description {
+  font-size: 16px;
+  color: var(--text-light);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.pillar-input {
+  width: 100%;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-bright);
+  font-size: 15px;
+  font-family: var(--font-family-base);
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.pillar-input:focus {
+  outline: none;
+  border-color: var(--cyan-clarity);
+  box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.2);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.pillar-input::placeholder {
+  color: rgba(226, 232, 240, 0.5);
+}
+
+.pillar-button {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--cyan-clarity), var(--magenta-niche));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pillar-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.pillar-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.pillar-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 191, 255, 0.5);
+}
+
+.pillar-button:active {
+  transform: scale(0.98);
+}
+
+.pillar-button.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.pillar-button.success {
+  background: linear-gradient(135deg, var(--lime-growth), var(--gold-achieve));
+}
+
+.pillar-output {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+  background: rgba(0, 191, 255, 0.05);
+  border-radius: 8px;
+  margin-top: 0;
+}
+
+.pillar-output.visible {
+  max-height: 500px;
+  padding: 20px;
+  margin-top: 16px;
+  border: 2px solid var(--cyan-clarity);
+}
+
+.output-content {
+  color: var(--text-light);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.checkmark {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--lime-growth);
+  font-size: 18px;
+  animation: checkPop 0.3s ease;
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* FORENSIC COVENANT */
+.forensic-section {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 80px 32px;
+  border-radius: 16px;
+  margin: 64px auto;
+  max-width: 1200px;
+  border: 2px solid var(--gold-achieve);
+}
+
+.forensic-content {
+  color: var(--text-light);
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+.forensic-content h3 {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gold-achieve);
+  margin: 48px 0 24px 0;
+  text-transform: uppercase;
+}
+
+.forensic-content p {
+  margin-bottom: 24px;
+}
+
+.forensic-content strong {
+  color: var(--orange-action);
+  font-weight: 700;
+}
+
+.pull-quote {
+  border-left: 6px solid var(--magenta-niche);
+  padding: 32px;
+  margin: 48px 0;
+  background: rgba(255, 0, 255, 0.05);
+  border-radius: 8px;
+  font-size: 24px;
+  font-style: italic;
+  color: var(--text-bright);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* FOOTER */
+.footer-section {
+  text-align: center;
+  padding: 100px 32px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 191, 255, 0.1) 100%);
+}
+
+.footer-quote {
+  font-size: clamp(24px, 4vw, 40px);
+  font-style: italic;
+  font-weight: 700;
+  color: var(--text-bright);
+  max-width: 1000px;
+  margin: 0 auto 48px auto;
+  line-height: 1.6;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+.footer-cta {
+  font-size: 20px;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+.achievement-tracker {
+  margin-top: 64px;
+  padding: 32px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  border: 2px solid var(--gold-achieve);
+}
+
+.achievement-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-achieve);
+  margin-bottom: 16px;
+}
+
+.achievement-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.achievement-badge {
+  padding: 12px 20px;
+  background: rgba(50, 205, 50, 0.1);
+  border: 2px solid var(--lime-growth);
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lime-growth);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.4s ease;
+}
+
+.achievement-badge.unlocked {
+  opacity: 1;
+  transform: scale(1);
+  animation: badgePulse 0.6s ease;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* LOADING SPINNER */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .nav-links {
+    gap: 16px;
+  }
+  
+  .nav-link {
+    font-size: 12px;
+  }
+  
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .pillars-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-section {
+    min-height: 80vh;
+    padding: 48px 20px;
+  }
+  
+  .section {
+    padding: 60px 20px;
+  }
+  
+  .cta-button {
+    padding: 16px 32px;
+    font-size: 16px;
+  }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* UTILITY CLASSES */
+.text-gradient {
+  background: linear-gradient(135deg, var(--cyan-clarity), var(--magenta-niche));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow {
+  filter: drop-shadow(0 0 20px currentColor);
+}
+
+/* CTA BUTTON */
+.cta-button {
+  margin-top: 32px;
+  padding: 20px 48px;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--quest-rare), var(--quest-legendary));
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 40px rgba(255, 0, 255, 0.4);
+  transition: all 0.3s ease;
+  letter-spacing: 0.05em;
+}
+
+.cta-button:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 15px 50px rgba(255, 0, 255, 0.6);
+}
+
+.cta-button:active {
+  transform: scale(1.05) translateY(-2px);
+}
+
+/* ROADMAP VISUAL */
+.roadmap-visual {
+  padding: 40px;
+  background: rgba(15, 10, 31, 0.6);
+  border-radius: 16px;
+  border: 2px solid var(--quest-gold);
+}
+
+.mission-node {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  margin: 10px;
+  border-radius: 50%;
+  border: 4px solid;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.4s ease;
+  text-align: center;
+  line-height: 72px;
+  font-size: 32px;
+}
+
+.mission-node.locked {
+  border-color: var(--mission-locked);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mission-node.active {
+  border-color: var(--mission-active);
+  animation: pulseMission 2s ease-in-out infinite;
+  box-shadow: 0 0 30px var(--mission-active);
+}
+
+.mission-node.complete {
+  border-color: var(--mission-complete);
+  background: rgba(50, 205, 50, 0.2);
+}
+
+.mission-node:hover:not(.locked) {
+  transform: scale(1.2) translateY(-10px);
+  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes pulseMission {
+  0%, 100% { box-shadow: 0 0 20px var(--mission-active); }
+  50% { box-shadow: 0 0 50px var(--mission-active); }
+}
+
+.mission-connector {
+  display: inline-block;
+  width: 40px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--quest-rare), var(--quest-legendary));
+  vertical-align: middle;
+  margin: 0 -5px;
+}
+
+/* MISSION LAYER (Full Screen Modal) */
+.mission-layer {
+  position: relative;
+}
+
+.mission-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.mission-modal.active {
+  display: flex;
+}
+
+.mission-content {
+  background: linear-gradient(135deg, rgba(15, 10, 31, 0.98), rgba(8, 5, 26, 0.98));
+  border: 3px solid var(--quest-gold);
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  padding: 48px;
+  position: relative;
+  box-shadow: 0 20px 80px rgba(255, 215, 0, 0.4);
+  animation: modalSlideIn 0.5s ease;
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: scale(0.8) translateY(50px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.mission-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 0, 0, 0.8);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mission-close:hover {
+  background: rgba(255, 0, 0, 1);
+  transform: rotate(90deg);
+}
+
+.mission-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.mission-title {
+  font-size: 36px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--quest-gold), var(--quest-legendary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+}
+
+.mission-description {
+  font-size: 18px;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+.sub-mission {
+  background: rgba(0, 191, 255, 0.05);
+  border-left: 4px solid var(--quest-rare);
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.sub-mission:hover {
+  background: rgba(0, 191, 255, 0.1);
+  transform: translateX(10px);
+}
+
+.sub-mission-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--quest-rare);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sub-mission-steps {
+  margin-left: 20px;
+}
+
+.quest-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: var(--text-light);
+}
+
+.step-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--quest-rare);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.step-checkbox:hover {
+  border-color: var(--quest-gold);
+  box-shadow: 0 0 10px var(--quest-rare);
+}
+
+.step-checkbox.checked {
+  background: var(--mission-complete);
+  border-color: var(--mission-complete);
+}
+
+.step-checkbox.checked::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.mission-progress-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 32px;
+  position: relative;
+}
+
+.mission-progress-fill {
+  height: 100%;
+  background: var(--progress-bar);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.mission-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: 800;
+  font-size: 12px;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.complete-mission-btn {
+  width: 100%;
+  padding: 20px;
+  margin-top: 24px;
+  background: linear-gradient(135deg, var(--mission-complete), var(--quest-gold));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.05em;
+}
+
+.complete-mission-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(50, 205, 50, 0.5);
+}
+
+.complete-mission-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* BADGE SHOWCASE */
+.badge-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 32px;
+  padding: 32px;
+}
+
+.badge-item {
+  background: rgba(15, 10, 31, 0.8);
+  border: 3px solid;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-item.locked {
+  border-color: var(--mission-locked);
+  opacity: 0.4;
+}
+
+.badge-item.unlocked {
+  border-color: var(--quest-gold);
+  animation: badgeUnlock 1s ease;
+}
+
+@keyframes badgeUnlock {
+  0% { transform: scale(0) rotate(-180deg); }
+  60% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.badge-item:hover.unlocked {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 20px 60px var(--badge-glow);
+}
+
+.badge-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  display: block;
+  filter: drop-shadow(0 0 20px var(--quest-gold));
+}
+
+.badge-item.locked .badge-icon {
+  filter: grayscale(100%) opacity(0.3);
+}
+
+.badge-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--quest-gold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.badge-tier {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.badge-desc {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.badge-unlock-date {
+  font-size: 11px;
+  color: var(--quest-rare);
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* BENCHMARKS BOARD */
+.benchmarks-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  padding: 32px;
+}
+
+.benchmark-card {
+  background: rgba(15, 10, 31, 0.8);
+  border: 2px solid var(--streak-fire);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.benchmark-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
+}
+
+.benchmark-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.benchmark-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--streak-fire);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.benchmark-desc {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.benchmark-status {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.benchmark-status.achieved {
+  background: rgba(50, 205, 50, 0.2);
+  border: 2px solid var(--mission-complete);
+  color: var(--mission-complete);
+}
+
+.benchmark-status.locked {
+  background: rgba(84, 110, 122, 0.2);
+  border: 2px solid var(--mission-locked);
+  color: var(--mission-locked);
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+@media (max-width: 768px) {
+  .journey-hud {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+  }
+  
+  .mission-content {
+    padding: 24px;
+  }
+  
+  .mission-title {
+    font-size: 28px;
+  }
+  
+  .badge-showcase,
+  .benchmarks-board {
+    grid-template-columns: 1fr;
+  }
+}
+    </style>
 </head>
 <body>
-  <div class="certificate">
-    <h1>★ Certificate of Mastery ★</h1>
-    <div class="badge">${tier.badge}</div>
-    <p style="font-size:20px;font-weight:bold;">This is to certify that</p>
-    <div class="name">Bearer of this Certificate</div>
-    <p style="font-size:20px;margin:30px 0;">has successfully achieved the rank of</p>
-    <div class="tier">${tier.name}</div>
-    <div class="description">
-      Through exceptional dedication, strategic mastery, and relentless pursuit of excellence,
-      this individual has demonstrated comprehensive expertise in systemic transformation,
-      completing ${userProgress.badges.length} missions, earning ${userProgress.xp} experience points,
-      and collecting ${userProgress.collectibles.length} unique artifacts of power.
+    <!-- SCROLL PROGRESS INDICATOR -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- STICKY NAVIGATION -->
+    <nav class="sticky-nav" id="stickyNav">
+        <div class="nav-container">
+            <div class="nav-title">HOLLYWOOD'S FINEST</div>
+            <div class="nav-links">
+                <a href="#hero" class="nav-link">Home</a>
+                <a href="#roadmap" class="nav-link">Quest Log</a>
+                <a href="#missions" class="nav-link">Discussion</a>
+                <a href="#badges" class="nav-link">Achievements</a>
+                <a href="#benchmarks" class="nav-link">Leaderboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- JOURNEY STATS HUD -->
+    <div class="journey-hud" id="journeyHud">
+        <div class="hud-title">🏆 Your Journey</div>
+        <div class="hud-stat">
+            <span class="hud-label">Level:</span>
+            <span class="hud-value" id="playerLevel">1</span>
+        </div>
+        <div class="hud-stat">
+            <span class="hud-label">XP:</span>
+            <span class="hud-value" id="playerXP">0</span>
+        </div>
+        <div class="level-bar">
+            <div class="level-fill" id="xpBar" style="width: 0%"></div>
+        </div>
+        <div class="hud-stat">
+            <span class="hud-label">Missions:</span>
+            <span class="hud-value" id="missionsComplete">0/24</span>
+        </div>
+        <div class="hud-stat">
+            <span class="hud-label">Streak:</span>
+            <span class="hud-value"><span class="streak-flame">🔥</span> <span id="streakCount">0</span></span>
+        </div>
+        <div class="hud-stat">
+            <span class="hud-label">Badges:</span>
+            <span class="hud-value" id="badgeCount">0</span>
+        </div>
     </div>
-    <div style="margin:40px 0;">
-      <div style="display:inline-block;margin:0 20px;">
-        <div style="font-weight:bold;color:#FFD700;">Mastery Multiplier</div>
-        <div style="font-size:24px;">${userProgress.masteryMultiplier.toFixed(1)}x</div>
-      </div>
-      <div style="display:inline-block;margin:0 20px;">
-        <div style="font-weight:bold;color:#FFD700;">Streak Record</div>
-        <div style="font-size:24px;">${userProgress.streak} days</div>
-      </div>
-      <div style="display:inline-block;margin:0 20px;">
-        <div style="font-weight:bold;color:#FFD700;">Level</div>
-        <div style="font-size:24px;">${userProgress.level}</div>
-      </div>
-    </div>
-    <div class="verification">
-      <div style="font-weight:bold;font-size:14px;margin-bottom:10px;">VERIFICATION CODE</div>
-      <div class="code">${verificationCode}</div>
-      <div style="font-size:12px;margin-top:10px;color:#666;">Verify at ascension-architect.com/verify</div>
-    </div>
-    <div class="date">Issued: ${dateStr}</div>
-    <div style="margin-top:30px;font-size:14px;color:#666;">
-      ASCENSION ARCHITECT: The Exponential Gamification System<br>
-      "Not just training, but transformation."
-    </div>
-  </div>
+
+    <!-- QUEST LOG: YOUR EPIC MISSIONS -->
+    <section class="section" id="roadmap" style="padding-top:140px;">
+        <h2 class="section-title">The Quest Log: Your Path to Mastery</h2>
+        <p class="section-description">Complete the Main Quest and Side Quests to unlock achievements, earn XP, and ascend through mastery tiers. Each quest builds your understanding of systemic barriers and intervention strategies.</p>
+        <div id="skillTreeContainer" style="background:rgba(15,10,31,0.8);border-radius:16px;padding:40px;border:2px solid var(--electric-cyan);margin:32px auto;max-width:1200px;">
+            <div id="skillTreeCanvas" style="min-height:600px;position:relative;overflow:auto;">
+                <!-- Interactive skill tree rendered by JS -->
+            </div>
+        </div>
+        <div id="currentTierDisplay" style="text-align:center;margin-top:32px;padding:24px;background:rgba(255,215,0,0.1);border-radius:12px;border:2px solid var(--plasma-gold);max-width:800px;margin-left:auto;margin-right:auto;">
+            <h3 style="color:var(--plasma-gold);font-size:28px;font-weight:900;margin-bottom:16px;">CURRENT TIER: <span id="currentTierName">NOVICE</span></h3>
+            <p style="color:var(--text-light);font-size:16px;margin-bottom:16px;" id="tierDescription">Complete 3 foundational missions to prove competency.</p>
+            <div style="margin-top:16px;">
+                <div style="font-size:14px;color:var(--text-light);margin-bottom:8px;">Progress to Next Tier:</div>
+                <div style="width:100%;height:24px;background:rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;">
+                    <div id="tierProgressBar" style="height:100%;background:var(--progress-bar);width:0%;transition:width 0.5s ease;"></div>
+                </div>
+                <div id="tierRequirements" style="margin-top:12px;font-size:13px;color:var(--text-light);"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="hero">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">🎬 HOLLYWOOD'S FINEST 🎬</h1>
+            <h2 class="hero-subtitle" id="subtitle">
+                <span>THE</span>
+                <span>AWAKENING</span>
+                <span>DECONSTRUCT</span>
+                <span>McKENZIE'S</span>
+                <span>ORDEAL</span>
+            </h2>
+            <p class="hero-mission">
+                Welcome to the ULTIMATE gamified discussion platform—a neurochemically-engineered learning ecosystem that transforms academic discourse into an EPIC quest experience. You have witnessed McKenzie Tran's calculated struggle through bureaucratic cruelty. Your mission: Perform forensic analysis of the systemic machinery that manufactured her suffering. This is not mere academic exercise—this is preparation for dismantling systemic malignancy. Every response earns XP. Every insight unlocks badges. Every peer connection forges alliances. Your AWAKENING begins NOW.
+            </p>
+            <button class="cta-button" onclick="scrollToRoadmap()">🎯 ACCEPT THE AWAKENING</button>
+            <div class="scroll-indicator">
+                <div class="scroll-arrow"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOCUMENTARY CONTEXT -->
+    <section class="section" id="origin">
+        <h2 class="section-title">McKenzie's Story: The Catalyst</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" data-target="1">0</span>
+                <span class="stat-label">Pregnant Mother</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" data-target="7">0</span>
+                <span class="stat-label">Months Homeless</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" data-target="34">0</span>
+                <span class="stat-label">Systemic Failures</span>
+            </div>
+        </div>
+        <p class="section-description" style="margin-top:48px;">
+            Witness McKenzie Tran's journey through LA County's fragmented social services infrastructure during pregnancy and homelessness.
+        </p>
+        <div class="video-container">
+            <iframe 
+                src="https://www.youtube.com/embed/If8WdRSq_78?si=72TzFI_oDwMW5qE0" 
+                title="Hollywood's Finest - McKenzie Tran Documentary" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </section>
+
+    <!-- PEER RESPONSE ZONE -->
+    <section class="section" id="missions">
+        <h2 class="section-title">Peer Alliance Zone: Forge Connections</h2>
+        <p class="section-description">
+            Engage with your classmates' insights. Each thoughtful peer response earns XP and builds your network of intellectual allies. Select responses below to view and respond.
+        </p>
+        <div id="peerResponseZone" style="margin-top:48px;">
+            <div style="text-align:center;padding:64px;background:rgba(0,191,255,0.05);border-radius:16px;border:2px dashed #00D9FF;">
+                <div style="font-size:64px;margin-bottom:24px;">🤝</div>
+                <h3 style="color:#00D9FF;font-size:24px;font-weight:800;margin-bottom:16px;">Peer Responses Coming Soon</h3>
+                <p style="color:#E2E8F0;font-size:16px;max-width:600px;margin:0 auto;line-height:1.8;">
+                    Once you and your classmates submit responses, they'll appear here as "Alliance Cards." You can read their insights, provide thoughtful feedback, and earn the <strong>Compassionate Witness</strong> achievement.
+                </p>
+                <div style="margin-top:32px;padding:20px;background:rgba(255,215,0,0.1);border-radius:12px;max-width:500px;margin-left:auto;margin-right:auto;">
+                    <div style="color:#FFD700;font-weight:700;font-size:14px;margin-bottom:8px;">🎯 SIDE QUEST AVAILABLE:</div>
+                    <div style="color:#E2E8F0;font-size:14px;line-height:1.6;">
+                        Provide <strong>2 thoughtful peer responses</strong> (1 paragraph each)<br>
+                        Reward: <strong>100 XP</strong> + Silver Key of Discourse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- READING MATERIALS SECTION -->
+    <section class="section" id="readings" style="display:none;">
+        <h2 class="section-title">Required Reading: Stratospheric Deconstruction</h2>
+        <div style="max-width:900px;margin:0 auto;background:rgba(0,191,255,0.05);padding:48px;border-radius:16px;border:2px solid #00D9FF;">
+            <div style="text-align:center;margin-bottom:32px;">
+                <div style="font-size:64px;margin-bottom:16px;">📚</div>
+                <h3 style="color:#00D9FF;font-size:28px;font-weight:900;margin-bottom:16px;">Stratospheric Deconstruction:</h3>
+                <p style="color:#FFD700;font-size:20px;font-weight:700;">Systemic Dereliction Within LA County's Social Services Infrastructure</p>
+            </div>
+            <div style="color:#E2E8F0;font-size:16px;line-height:1.9;">
+                <p style="margin-bottom:20px;">
+                    This supplementary analysis provides the theoretical framework for understanding McKenzie's experience within broader systemic failures. Key concepts include:
+                </p>
+                <ul style="margin-left:24px;margin-bottom:24px;">
+                    <li style="margin-bottom:12px;"><strong style="color:#FFD700;">The $1 vs $100 Paradox:</strong> How $1 in preventative investment could have prevented $100 in crisis intervention costs</li>
+                    <li style="margin-bottom:12px;"><strong style="color:#FFD700;">Strategic Attrition:</strong> Bureaucratic processes designed to exhaust rather than serve</li>
+                    <li style="margin-bottom:12px;"><strong style="color:#FFD700;">Bureaucratic Fragmentation:</strong> Siloed agencies creating impossible compliance scenarios</li>
+                    <li style="margin-bottom:12px;"><strong style="color:#FFD700;">The Warm Handoff:</strong> Integrated transition protocols between service providers</li>
+                    <li style="margin-bottom:12px;"><strong style="color:#FFD700;">The 34 Vows:</strong> Comprehensive framework for trauma-informed advocacy</li>
+                </ul>
+                <div style="background:rgba(255,215,0,0.1);padding:24px;border-radius:12px;border-left:4px solid #FFD700;margin-top:32px;">
+                    <div style="color:#FFD700;font-weight:800;font-size:14px;margin-bottom:12px;">✨ ACHIEVEMENT UNLOCKED:</div>
+                    <div style="color:#E2E8F0;font-size:14px;">
+                        Reading this section earns you the <strong>"The Scholar"</strong> badge (+50 XP)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- THE 24 PILLARS SECTION (HIDDEN) -->
+    <section class="section" id="pillars" style="display:none;">
+        <h2 class="section-title">The 24 Pillars of Transformation</h2>
+        <p class="section-description">
+            Revolutionary AI-powered tools designed to annihilate systemic barriers and reconstruct pathways to stability.
+        </p>
+        
+        <div class="pillars-grid" id="pillarsGrid"></div>
+    </section>
+
+    <!-- DOCUMENTARY CONTEXT: THE CHALLENGE -->
+    <section class="section" id="challenge" style="padding-top:80px;padding-bottom:80px;">
+        <h2 class="section-title">The Challenge: McKenzie's System Gauntlet</h2>
+        <p class="section-description">
+            McKenzie Tran navigated a maze of misaligned agencies while pregnant and homeless. These charts reveal the systemic contradictions she faced.
+        </p>
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <h3 class="chart-title">Timeline Paradox: Institution vs. Clinical Reality</h3>
+                <div class="chart-canvas">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h3 class="chart-title">Focus Misallocation</h3>
+                <div class="chart-canvas">
+                    <canvas id="focusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORENSIC COVENANT SECTION -->
+    <section class="section forensic-section" id="covenant" style="display:none;">
+        <h2 class="section-title">The Forensic Covenant</h2>
+        <div class="forensic-content">
+            <p>
+                This is not advocacy—this is <strong>systemic reconstruction</strong>. The current framework operates on a 6-month compliance mandate while clinical recovery requires 24 months. This mathematical impossibility creates a predatory cycle that punishes trauma survivors for exhibiting symptoms of their trauma.
+            </p>
+            
+            <div class="pull-quote">
+                "The system measures success by housing placement dates, not by the eradication of the conditions that caused homelessness."
+            </div>
+            
+            <h3>The Silo Problem</h3>
+            <p>
+                Bureaucratic fragmentation means that housing services, mental health treatment, legal advocacy, and child welfare operate as isolated kingdoms. Each demands documentation the others won't provide. Each has different eligibility criteria. Each punishes clients for the failures of the others.
+            </p>
+            
+            <h3>The Trauma Paradox</h3>
+            <p>
+                When a mother with PTSD misses a DCFS appointment due to a panic attack, the system labels it "non-compliance" rather than recognizing it as a symptom requiring clinical intervention. <strong>The system criminalizes the condition it was designed to treat.</strong>
+            </p>
+            
+            <h3>The Holistic Solution</h3>
+            <p>
+                The 24 Pillars represent a paradigm shift: from fragmented compliance monitoring to integrated outcome achievement. Every tool in this architecture is designed to simultaneously address multiple co-occurring needs while documenting systemic failures—not client deficiencies.
+            </p>
+            
+            <div class="pull-quote">
+                "We don't just place people in housing. We reconstruct the conditions that make stability possible."
+            </div>
+        </div>
+    </section>
+
+    <!-- COLLECTIBLES & ARTIFACTS SYSTEM -->
+    <section class="section" id="badges">
+        <h2 class="section-title">🏅 Collectibles: Functional Catalysts of Power</h2>
+        <p class="section-description">
+            These are not cosmetic badges—they are OPERATIONAL LEAPS. Artifacts of Insight unlock advanced tools. Volatile Data Shards assemble into policy briefs. Blueprint Fragments construct the Grand Unification Engine. Strategic Keys unlock impossible missions.
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-bottom:48px;">
+            <div style="background:rgba(0,191,255,0.1);border:2px solid var(--electric-cyan);border-radius:12px;padding:24px;">
+                <h3 style="color:var(--electric-cyan);font-size:18px;font-weight:800;margin-bottom:12px;">⚡ Mastery Multiplier (μ-Factor)</h3>
+                <div style="font-size:48px;font-weight:900;color:var(--electric-cyan);margin:16px 0;"><span id="masteryMultiplier">1.0</span>x</div>
+                <p style="font-size:14px;color:var(--text-light);">Your current learning velocity multiplier. Increases with Nexus Challenge completions.</p>
+            </div>
+            <div style="background:rgba(255,215,0,0.1);border:2px solid var(--plasma-gold);border-radius:12px;padding:24px;">
+                <h3 style="color:var(--plasma-gold);font-size:18px;font-weight:800;margin-bottom:12px;">🔑 Artifacts Collected</h3>
+                <div style="font-size:48px;font-weight:900;color:var(--plasma-gold);margin:16px 0;"><span id="artifactCount">0</span>/20</div>
+                <p style="font-size:14px;color:var(--text-light);">Unique collectibles that unlock advanced capabilities.</p>
+            </div>
+            <div style="background:rgba(255,0,255,0.1);border:2px solid var(--magenta-niche);border-radius:12px;padding:24px;">
+                <h3 style="color:var(--magenta-niche);font-size:18px;font-weight:800;margin-bottom:12px;">💎 Critical Success Rate</h3>
+                <div style="font-size:48px;font-weight:900;color:var(--magenta-niche);margin:16px 0;"><span id="criticalRate">10</span>%</div>
+                <p style="font-size:14px;color:var(--text-light);">Chance for double XP + rare artifact on mission completion.</p>
+            </div>
+        </div>
+        <div id="badgeShowcase" class="badge-showcase"></div>
+        <div id="collectiblesInventory" style="margin-top:48px;">
+            <h3 style="text-align:center;font-size:28px;font-weight:800;color:var(--plasma-gold);margin-bottom:24px;">YOUR INVENTORY</h3>
+            <div id="inventoryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;"></div>
+        </div>
+    </section>
+
+    <!-- ELITE GATES & VALIDATION SCENARIOS -->
+    <section class="section" id="benchmarks">
+        <h2 class="section-title">🔥 Elite Gates: Validation Challenges</h2>
+        <p class="section-description">These are not simple checkpoints—they are GATES TO NEW DIMENSIONS. Each tier requires comprehensive, stress-tested demonstration of expertise. Pass the validation scenarios to transcend.</p>
+        <div id="tierGatesContainer" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;margin:48px 0;">
+            <!-- Tier gates dynamically rendered -->
+        </div>
+        <h3 style="text-align:center;font-size:28px;font-weight:800;color:var(--streak-fire);margin:64px 0 32px;">Benchmark Achievements</h3>
+        <div id="benchmarksBoard" class="benchmarks-board"></div>
+    </section>
+
+    <!-- FOOTER SECTION -->
+    <section class="footer-section">
+        <p class="footer-quote">
+            Your purpose is crystal clear. Your journey is eternal. Every mission conquered, every badge earned, every streak extended—this is your legacy of mastery.
+        </p>
+        <p class="footer-cta">
+            Return daily. Unlock secrets. Ascend higher. The revolution is yours.
+        </p>
+        
+        <div class="achievement-tracker">
+            <h3 class="achievement-title">Random Motivational Boost</h3>
+            <div class="achievement-list" id="motoQuotes"></div>
+        </div>
+        
+        <!-- HALL OF FAME -->
+        <div style="margin-top:64px;padding:48px;background:rgba(255,215,0,0.05);border-radius:16px;border:2px solid var(--plasma-gold);max-width:1000px;margin-left:auto;margin-right:auto;">
+            <h3 style="color:var(--plasma-gold);font-size:32px;font-weight:900;text-align:center;margin-bottom:32px;text-transform:uppercase;">🏆 HALL OF FAME: TRANSCENDENT ARCHITECTS</h3>
+            <p style="color:var(--text-light);text-align:center;margin-bottom:32px;font-size:16px;">
+                The elite few who have achieved the ultimate tier. Their names are eternal.
+            </p>
+            <div id="hallOfFameLeaderboard" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px;">
+                <div style="background:rgba(255,215,0,0.1);border:2px solid var(--plasma-gold);border-radius:12px;padding:24px;text-align:center;">
+                    <div style="font-size:48px;margin-bottom:12px;">🌟</div>
+                    <div style="color:var(--plasma-gold);font-weight:900;font-size:18px;margin-bottom:8px;">RANK #1</div>
+                    <div style="color:white;font-weight:700;font-size:16px;margin-bottom:8px;">SystemArchitect_Prime</div>
+                    <div style="color:var(--text-light);font-size:14px;">128,450 XP</div>
+                    <div style="color:var(--text-light);font-size:13px;margin-top:8px;">Multiplier: 3.5x</div>
+                </div>
+                <div style="background:rgba(229,228,226,0.1);border:2px solid #E5E4E2;border-radius:12px;padding:24px;text-align:center;">
+                    <div style="font-size:48px;margin-bottom:12px;">💎</div>
+                    <div style="color:#E5E4E2;font-weight:900;font-size:18px;margin-bottom:8px;">RANK #2</div>
+                    <div style="color:white;font-weight:700;font-size:16px;margin-bottom:8px;">PolicyWarrior_Apex</div>
+                    <div style="color:var(--text-light);font-size:14px;">96,200 XP</div>
+                    <div style="color:var(--text-light);font-size:13px;margin-top:8px;">Multiplier: 3.2x</div>
+                </div>
+                <div style="background:rgba(205,127,50,0.1);border:2px solid #CD7F32;border-radius:12px;padding:24px;text-align:center;">
+                    <div style="font-size:48px;margin-bottom:12px;">👑</div>
+                    <div style="color:#CD7F32;font-weight:900;font-size:18px;margin-bottom:8px;">RANK #3</div>
+                    <div style="color:white;font-weight:700;font-size:16px;margin-bottom:8px;">TraumaDefender_Elite</div>
+                    <div style="color:var(--text-light);font-size:14px;">82,750 XP</div>
+                    <div style="color:var(--text-light);font-size:13px;margin-top:8px;">Multiplier: 3.0x</div>
+                </div>
+                <div style="background:rgba(0,217,255,0.1);border:2px solid var(--electric-cyan);border-radius:12px;padding:24px;text-align:center;opacity:0.5;position:relative;">
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:64px;opacity:0.3;">❓</div>
+                    <div style="font-size:48px;margin-bottom:12px;filter:blur(4px);">🎯</div>
+                    <div style="color:var(--electric-cyan);font-weight:900;font-size:18px;margin-bottom:8px;">YOUR NAME HERE</div>
+                    <div style="color:white;font-weight:700;font-size:16px;margin-bottom:8px;">Ascend to claim your throne</div>
+                </div>
+            </div>
+            <div style="margin-top:32px;text-align:center;color:var(--text-light);font-size:14px;font-style:italic;">
+                Leaderboard updates in real-time. Compete globally. Achieve immortality.
+            </div>
+        </div>
+        
+        <div style="margin-top:64px;padding:48px;background:rgba(0,191,255,0.05);border-radius:16px;border:2px solid var(--electric-cyan);max-width:900px;margin-left:auto;margin-right:auto;">
+            <h3 style="color:var(--electric-cyan);font-size:28px;font-weight:900;text-align:center;margin-bottom:24px;">🚀 PILLAR 5: TRANSCENDENT DEPLOYMENT</h3>
+            <p style="color:var(--text-light);text-align:center;margin-bottom:24px;font-size:16px;line-height:1.8;">
+                This application is <strong>GitHub Pages ready</strong>, enterprise-grade, and fully functional. Deploy globally in minutes.
+            </p>
+            <div style="background:rgba(0,0,0,0.5);padding:24px;border-radius:12px;font-family:monospace;font-size:13px;color:#00FF88;line-height:1.8;">
+                <div><span style="color:#FFD700;">$</span> git clone [repository]</div>
+                <div><span style="color:#FFD700;">$</span> cd hangontoyourchonersfam/</div>
+                <div><span style="color:#FFD700;">$</span> git push origin main</div>
+                <div style="margin-top:12px;color:#00D9FF;"># Enable GitHub Pages in Settings &gt; Pages</div>
+                <div style="color:#00D9FF;"># Source: main branch, root folder</div>
+                <div style="margin-top:12px;color:#FF00FF;">✓ Live at: https://bsigala.github.io/hangontoyourchonersfam/</div>
+            </div>
+            <div style="margin-top:24px;text-align:center;">
+                <div style="display:inline-flex;gap:16px;flex-wrap:wrap;justify-content:center;">
+                    <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ 100% Static HTML/CSS/JS</div>
+                    <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ No Server Dependencies</div>
+                    <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ Mobile Responsive</div>
+                    <div style="background:rgba(50,205,50,0.2);border:2px solid #32CD32;padding:12px 20px;border-radius:20px;color:#32CD32;font-weight:700;font-size:13px;">✓ WCAG AA Compliant</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js" defer></script>
 </body>
 </html>
-  `;
-  
-  // Create download
-  const blob = new Blob([certificateHTML], {type: 'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Ascension_Certificate_${tier.name}_${verificationCode}.html`;
-  a.click();
-  URL.revokeObjectURL(url);
-  
-  showCelebrationToast('✨ Certificate Downloaded! Open in browser to view and print.');
-}
-
-function generateVerificationCode() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 16; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-    if ((i + 1) % 4 === 0 && i < 15) code += '-';
-  }
-  return code;
-}
-
-// COLLECTIBLES INVENTORY
-function renderCollectiblesInventory() {
-  const masteryEl = document.getElementById('masteryMultiplier');
-  const artifactEl = document.getElementById('artifactCount');
-  const criticalEl = document.getElementById('criticalRate');
-  
-  if (masteryEl) masteryEl.textContent = userProgress.masteryMultiplier.toFixed(1);
-  if (artifactEl) artifactEl.textContent = userProgress.collectibles.length;
-  if (criticalEl) criticalEl.textContent = userProgress.criticalSuccessRate;
-  
-  const grid = document.getElementById('inventoryGrid');
-  if (!grid) return;
-  
-  grid.innerHTML = '';
-  
-  if (userProgress.collectibles.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#777;padding:32px;font-style:italic;">Complete missions to collect powerful artifacts...</div>';
-    return;
-  }
-  
-  userProgress.collectibles.forEach(c => {
-    const div = document.createElement('div');
-    const rarityColors = {common:'#32CD32',uncommon:'#00BFFF',rare:'#9370DB',epic:'#FF00FF',legendary:'#FFD700',mythic:'#FF69B4'};
-    
-    div.style.cssText = `
-      background: rgba(15,10,31,0.8);
-      border: 2px solid ${rarityColors[c.rarity] || '#777'};
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      transition: all 0.3s ease;
-    `;
-    
-    div.innerHTML = `
-      <div style="font-size:48px;margin-bottom:12px;">${c.icon}</div>
-      <div style="color:${rarityColors[c.rarity]};font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:8px;">${c.rarity}</div>
-      <div style="color:white;font-size:14px;font-weight:700;margin-bottom:8px;">${c.name}</div>
-      ${c.effect ? `<div style="color:#00FF88;font-size:11px;font-style:italic;">${c.effect}</div>` : ''}
-    `;
-    
-    div.addEventListener('mouseenter', () => {
-      div.style.transform = 'translateY(-5px) scale(1.05)';
-      div.style.boxShadow = `0 10px 30px ${rarityColors[c.rarity]}`;
-    });
-    div.addEventListener('mouseleave', () => {
-      div.style.transform = 'none';
-      div.style.boxShadow = 'none';
-    });
-    
-    grid.appendChild(div);
-  });
-}
-
-// BADGE SHOWCASE
-function renderBadgeShowcase(){
-  const el=document.getElementById('badgeShowcase');
-  el.innerHTML='';
-  achievementBadges.forEach(badge=>{
-    const unlocked = userProgress.badges.includes(badge.name.toLowerCase().replace(/ /g,'-'));
-    const div=document.createElement('div');
-    div.className='badge-item'+(unlocked?' unlocked':' locked');
-    div.innerHTML=`<div class='badge-icon'>${badge.icon}</div><div class='badge-name'>${badge.name}</div><div class='badge-tier'>${badge.tier}</div><div class='badge-desc'>${badge.desc}</div>${unlocked?`<div class='badge-unlock-date'>Unlocked: ${userProgress.unlockDates[badge.name.toLowerCase().replace(/ /g,'-')]?new Date(userProgress.unlockDates[badge.name.toLowerCase().replace(/ /g,'-')]).toLocaleDateString():''}</div>`:''}`;
-    el.appendChild(div);
-  });
-  collectiblesList.forEach(c=>{
-    const unlocked = userProgress.collectibles.includes(c.name);
-    const div=document.createElement('div');
-    div.className='badge-item'+(unlocked?' unlocked':' locked');
-    div.innerHTML=`<div class='badge-icon'>${c.icon}</div><div class='badge-name'>${c.name}</div><div class='badge-tier'>${c.tier||"Secret"}</div><div class='badge-desc'>${c.desc}</div>${unlocked?'<div class=badge-unlock-date>Unlocked: ???</div>':''}`;
-    el.appendChild(div);
-  })
-}
-
-// BENCHMARKS
-function renderBenchmarksBoard(){
-  const el=document.getElementById('benchmarksBoard');
-  el.innerHTML='';
-  benchmarks.forEach(bm=>{
-    const achieved = false; // Benchmark logic tier2
-    el.innerHTML += `<div class='benchmark-card'>
-      <div class='benchmark-icon'>${bm.icon}</div>
-      <div class='benchmark-title'>${bm.title}</div>
-      <div class='benchmark-desc'>${bm.desc}</div>
-      <div class='benchmark-status ${achieved?'achieved':'locked'}'>${achieved?'Achieved':'Locked'}</div>
-    </div>`
-  });
-}
-
-// INSPIRATIONAL MOTIVATION
-function renderMotivationalQuotes() {
-  const motoEl=document.getElementById("motoQuotes");
-  motoEl.innerHTML=`<div style='font-size:18px;color:#FFD700;'>"${inspirationalQuotes[Math.floor(Math.random()*inspirationalQuotes.length)]}"</div>`;
-}
-
-// HERO CTA
-window.scrollToRoadmap = function(){
-  document.getElementById('roadmap').scrollIntoView({behavior:'smooth'});
-}
-
-
-// CHARTS INITIALIZATION
-function initializeCharts() {
-  // TIMELINE CHART
-  const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-  new Chart(timelineCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Institutional Mandate', 'Advocate-Stated Clinical Need'],
-      datasets: [{
-        label: 'Months Required',
-        data: [6, 24],
-        backgroundColor: ['#FF4500', '#00BFFF'],
-        borderColor: ['#FF6347', '#00CED1'],
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: '#E2E8F0'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
-        },
-        x: {
-          ticks: {
-            color: '#E2E8F0'
-          },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
-          }
-        }
-      }
-    }
-  });
-  
-  // FOCUS MISALLOCATION CHART
-  const focusCtx = document.getElementById('focusChart').getContext('2d');
-  new Chart(focusCtx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Housing Compliance & Quotas', 'Primary Recovery & Trauma Treatment'],
-      datasets: [{
-        data: [80, 20],
-        backgroundColor: ['#FF4500', '#546E7A'],
-        borderColor: ['#FF6347', '#607D8B'],
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: '#E2E8F0',
-            padding: 20,
-            font: {
-              size: 14
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-// SCROLL ANIMATIONS
-function initializeScrollAnimations() {
-  const sections = document.querySelectorAll('.section');
-  
-  const observerOptions = {
-    threshold: 0.15,
-    rootMargin: '0px 0px -100px 0px'
-  };
-  
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, observerOptions);
-  
-  sections.forEach(section => {
-    observer.observe(section);
-  });
-}
-
-// STAT COUNTER ANIMATION
-function initializeStatCounters() {
-  const statValues = document.querySelectorAll('.stat-value');
-  let animated = false;
-  
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !animated) {
-        animated = true;
-        statValues.forEach(stat => {
-          animateCounter(stat);
-        });
-      }
-    });
-  }, { threshold: 0.5 });
-  
-  if (statValues.length > 0) {
-    observer.observe(statValues[0].closest('.stats-grid'));
-  }
-}
-
-function animateCounter(element) {
-  const target = parseInt(element.dataset.target);
-  const duration = 2000;
-  const increment = target / (duration / 16);
-  let current = 0;
-  
-  const timer = setInterval(() => {
-    current += increment;
-    if (current >= target) {
-      element.textContent = target.toLocaleString();
-      clearInterval(timer);
-    } else {
-      element.textContent = Math.floor(current).toLocaleString();
-    }
-  }, 16);
-}
-
-// STICKY NAV
-function initializeStickyNav() {
-  const nav = document.getElementById('stickyNav');
-  const heroSection = document.getElementById('hero');
-  
-  window.addEventListener('scroll', () => {
-    const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
-    
-    if (window.scrollY > heroBottom) {
-      nav.classList.add('visible');
-    } else {
-      nav.classList.remove('visible');
-    }
-  });
-}
-
-// SCROLL PROGRESS
-function initializeScrollProgress() {
-  const progressBar = document.getElementById('scrollProgress');
-  
-  window.addEventListener('scroll', () => {
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight - windowHeight;
-    const scrolled = window.scrollY;
-    const progress = (scrolled / documentHeight) * 100;
-    
-    progressBar.style.width = progress + '%';
-    
-    // UPDATE SCROLL DEPTH FOR ACHIEVEMENTS
-    userState.scrollDepth = Math.max(userState.scrollDepth, Math.floor(progress));
-    checkAchievements();
-  });
-}
-
-// CELEBRATION TOAST
-// CELEBRATION & NEUROCHEMICAL FEEDBACK
-function showCelebrationToast(msg, duration = 3000) {
-  let toast = document.getElementById('celebrationToast');
-  if(!toast){
-    toast=document.createElement('div');
-    toast.id='celebrationToast';
-    toast.style='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#FFD700,#FF00FF);color:white;padding:32px 48px;border-radius:16px;font-size:24px;font-weight:800;z-index:3000;box-shadow:0 20px 80px rgba(255,215,0,0.8);animation:toastBounce 0.8s ease;text-align:center;max-width:80%;';
-    document.body.appendChild(toast);
-  }
-  toast.textContent=msg;
-  toast.style.display='block';
-  
-  // DOPAMINE: Particle effect
-  createParticleExplosion();
-  
-  setTimeout(()=>{toast.style.display='none';},duration);
-}
-
-function createParticleExplosion() {
-  const container = document.createElement('div');
-  container.style.cssText = 'position:fixed;top:50%;left:50%;width:0;height:0;z-index:2999;pointer-events:none;';
-  document.body.appendChild(container);
-  
-  for (let i = 0; i < 30; i++) {
-    const particle = document.createElement('div');
-    const angle = (Math.PI * 2 * i) / 30;
-    const velocity = 100 + Math.random() * 100;
-    
-    particle.style.cssText = `
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: ${['#FFD700','#FF00FF','#00D9FF','#00FF88'][Math.floor(Math.random()*4)]};
-      border-radius: 50%;
-      animation: particleFly 1s ease-out forwards;
-    `;
-    
-    particle.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
-    particle.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
-    
-    container.appendChild(particle);
-  }
-  
-  setTimeout(() => container.remove(), 1000);
-}
-
-// ========================================
-// PILLAR 4: INTEGRATED THRILL SENSATIONS
-// ========================================
-
-// NEUROCHEMICAL COMMITMENT PROTOCOL
-
-// Adrenaline Spike: Time-sensitive missions (future enhancement)
-function startTimedMission(missionId, duration) {
-  // Creates urgency and flow state
-  console.log(`Timed mission started: ${duration}s`);
-}
-
-// Dopamine Hit: Already implemented via instant feedback + particle effects
-
-// Serotonin Surge: Social recognition
-function shareAchievement(achievementName) {
-  const shareText = `I just achieved ${achievementName} in Ascension Architect! 🏆 Join the revolution of systemic mastery.`;
-  
-  if (navigator.share) {
-    navigator.share({
-      title: 'Ascension Architect Achievement',
-      text: shareText,
-      url: window.location.href
-    }).catch(err => console.log('Share cancelled'));
-  } else {
-    // Fallback: Copy to clipboard
-    navigator.clipboard.writeText(shareText + ' ' + window.location.href);
-    showCelebrationToast('📋 Achievement copied to clipboard! Share with the world!');
-  }
-}
-
-// Endorphin Rush: Long-form completion satisfaction
-function celebrateGrandCompletion() {
-  // Triggered on Grand Challenge or all pillars complete
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95); z-index: 4000;
-    display: flex; align-items: center; justify-content: center;
-    animation: fadeIn 1s ease;
-  `;
-  
-  modal.innerHTML = `
-    <div style="text-align:center;max-width:800px;padding:64px;animation:modalBounce 1s ease;">
-      <div style="font-size:120px;margin-bottom:24px;animation:spin 2s linear infinite;">🌟</div>
-      <h1 style="font-size:64px;font-weight:900;background:linear-gradient(135deg,#FFD700,#FF00FF,#00D9FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;text-transform:uppercase;">TRANSCENDENCE ACHIEVED</h1>
-      <p style="font-size:24px;color:#E2E8F0;line-height:1.8;margin-bottom:48px;">
-        You have completed the ultimate journey. Your mastery is undeniable. Your legacy is eternal.
-        The system has been forever changed by your presence.
-      </p>
-      <button onclick="this.parentElement.parentElement.remove()" style="padding:20px 48px;background:linear-gradient(135deg,#FFD700,#FF00FF);border:none;border-radius:50px;color:white;font-size:20px;font-weight:800;cursor:pointer;text-transform:uppercase;box-shadow:0 10px 40px rgba(255,215,0,0.6);">
-        EMBRACE IMMORTALITY
-      </button>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  createMassiveParticleExplosion();
-}
-
-function createMassiveParticleExplosion() {
-  for (let burst = 0; burst < 5; burst++) {
-    setTimeout(() => createParticleExplosion(), burst * 200);
-  }
-}
-
-// SOUND EFFECTS (Web Audio API - safe for sandbox)
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-function playTone(frequency, duration, type = 'sine') {
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  
-  oscillator.type = type;
-  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-  
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-  
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + duration);
-}
-
-function playSuccessSound() {
-  // Ascending chime
-  playTone(523.25, 0.1); // C
-  setTimeout(() => playTone(659.25, 0.1), 100); // E
-  setTimeout(() => playTone(783.99, 0.2), 200); // G
-}
-
-function playLevelUpSound() {
-  // Triumphant fanfare
-  playTone(523.25, 0.15);
-  setTimeout(() => playTone(659.25, 0.15), 150);
-  setTimeout(() => playTone(783.99, 0.15), 300);
-  setTimeout(() => playTone(1046.50, 0.3), 450); // High C
-}
-
-function playCollectibleSound() {
-  // Sparkle
-  playTone(1318.51, 0.1, 'sine'); // High E
-  setTimeout(() => playTone(1567.98, 0.15, 'sine'), 80); // High G
-}
-
-const particleStyle = document.createElement('style');
-particleStyle.textContent = `
-@keyframes particleFly {
-  0% { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-}
-`;
-document.head.appendChild(particleStyle);
-const toastBounceStyle=document.createElement('style');
-toastBounceStyle.textContent='@keyframes toastBounce{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.15);}}';
-document.head.appendChild(toastBounceStyle);
-
-// SMOOTH SCROLL FOR NAV LINKS
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const targetId = link.getAttribute('href');
-    const targetSection = document.querySelector(targetId);
-    
-    if (targetSection) {
-      targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-});
